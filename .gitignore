@@ -1,0 +1,37 @@
+# Ambiente Virtual Python
+venv/
+*.pyc
+__pycache__/
+.env
+
+# Arquivos de Sistema Operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dados e Arquivos Grandes
+# É CRUCIAL não enviar dados sensíveis ou arquivos muito grandes para o Git.
+# Seus PDFs e o índice FAISS podem ser grandes e/ou conter dados que você não quer no repositório.
+# Se você decidir não versioná-los, adicione as seguintes linhas:
+data/pdfs/
+data/vector_store/
+# Ou, se quiser ser mais específico:
+# data/pdfs/pessoal/
+# data/pdfs/contratos/
+# data/vector_store/faiss_index_diario_oficial_ollama/
+
+# Arquivos de log
+*.log
+
+# Arquivos temporários ou de build específicos do seu projeto (adicione conforme necessário)
+# build/
+# dist/
+# *.egg-info/
+
+# Arquivos específicos do SQLite (se você usar para algo)
+*.sqlite3
