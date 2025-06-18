@@ -1,85 +1,89 @@
 # src/vector_store_manager.py
 """
-Gerenciador para criar, salvar e carregar o Vector Store (FAISS).
+Gerenciador para criar o Vector Store a partir de arquivos PDF.
+ESTRATÉGIA SIMPLIFICADA: Usa o RecursiveCharacterTextSplitter padrão da indústria,
+com parâmetros otimizados para os extratos de contrato.
 """
 import os
 import time
+from langchain_community.document_loaders import PyPDFDirectoryLoader
+from langchain_core.documents import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
 from langchain_community.vectorstores import FAISS
-from .config import FAISS_INDEX_PATH, PDF_DIRECTORY
-from .data_processor import load_and_process_pdfs
+from .config import FAISS_INDEX_PATH, PDF_DIRECTORY, CHUNK_SIZE, CHUNK_OVERLAP
 from .llm_interface import get_ollama_embeddings
 
 _cached_vector_store = None
 
-def get_vector_store(force_recreate=False, force_reload_embeddings=False):
+def load_and_chunk_pdfs(directory: str) -> list[Document]:
     """
-    Carrega um índice FAISS existente ou cria um novo se não existir ou se force_recreate=True.
-    Cacheia a instância do vector store.
+    Carrega todos os PDFs de um diretório e os divide em chunks
+    usando o RecursiveCharacterTextSplitter.
+    """
+    if not os.path.isdir(directory):
+        print(f"ERRO: Diretório de PDFs não encontrado em '{directory}'")
+        return []
+
+    print(f"Carregando e processando PDFs do diretório: {directory}...")
+    loader = PyPDFDirectoryLoader(directory, recursive=True)
+    docs_from_pdfs = loader.load()
+
+    print(f"Dividindo {len(docs_from_pdfs)} páginas em chunks (tamanho: {CHUNK_SIZE}, sobreposição: {CHUNK_OVERLAP})...")
+    
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP,
+        length_function=len,
+        is_separator_regex=False,
+    )
+    
+    chunks = text_splitter.split_documents(docs_from_pdfs)
+    
+    print(f"Total de {len(chunks)} chunks criados.")
+    return chunks
+
+def get_vector_store(force_recreate=False):
+    """
+    Carrega um índice FAISS existente ou cria um novo a partir dos PDFs.
     """
     global _cached_vector_store
-    if _cached_vector_store is not None and not force_recreate:
-        # print("Usando Vector Store FAISS do cache.") # Opcional
+    if _cached_vector_store is not None and not force_reload:
         return _cached_vector_store
 
-    embeddings_model = get_ollama_embeddings(force_reload=force_reload_embeddings)
+    embeddings_model = get_ollama_embeddings()
     if not embeddings_model:
-        return None 
+        return None
 
-    vectorstore = None
+    if not force_recreate and os.path.exists(FAISS_INDEX_PATH):
+        print(f"\nCarregando índice FAISS existente de: {FAISS_INDEX_PATH}")
+        _cached_vector_store = FAISS.load_local(
+            FAISS_INDEX_PATH,
+            embeddings_model,
+            allow_dangerous_deserialization=True
+        )
+        print("Índice FAISS carregado com sucesso.")
+        return _cached_vector_store
+    
+    print("\nCriando um novo índice FAISS a partir dos arquivos PDF (Estratégia: Splitter Recursivo)...")
+    
+    documents_to_index = load_and_chunk_pdfs(PDF_DIRECTORY)
+    if not documents_to_index:
+        print("Nenhum documento encontrado para indexar. Abortando.")
+        return None
 
-    if not force_recreate and os.path.exists(FAISS_INDEX_PATH) and os.path.isdir(FAISS_INDEX_PATH):
-        print(f"Tentando carregar índice FAISS existente de: {FAISS_INDEX_PATH}")
-        try:
-            start_time_load = time.time()
-            vectorstore = FAISS.load_local(
-                FAISS_INDEX_PATH,
-                embeddings_model,
-                allow_dangerous_deserialization=True
-            )
-            end_time_load = time.time()
-            print(f"Índice FAISS carregado com sucesso em {end_time_load - start_time_load:.2f} segundos.")
-        except Exception as e:
-            print(f"  Erro ao carregar índice FAISS: {e}. Tentando criar um novo.")
-            vectorstore = None
-    else:
-        if force_recreate:
-            print(f"Forçando recriação do índice FAISS.")
-        else:
-            print(f"Índice FAISS não encontrado em '{FAISS_INDEX_PATH}'. Será criado um novo.")
-
-    if vectorstore is None:
-        print("Iniciando a criação de um novo índice FAISS...")
-        
-        os.makedirs(os.path.dirname(FAISS_INDEX_PATH), exist_ok=True) # Garante que o diretório do índice exista
-        # PDF_DIRECTORY é configurado em config.py, não precisa criar aqui se já existir
-        # os.makedirs(PDF_DIRECTORY, exist_ok=True) 
-
-        all_document_chunks = load_and_process_pdfs(PDF_DIRECTORY)
-        
-        if all_document_chunks:
-            print(f"Gerando embeddings para {len(all_document_chunks)} chunks e construindo o índice FAISS...")
-            start_time_create = time.time()
-            try:
-                vectorstore = FAISS.from_documents(
-                    documents=all_document_chunks,
-                    embedding=embeddings_model
-                )
-                end_time_create = time.time()
-                print(f"Novo índice FAISS criado com sucesso em {end_time_create - start_time_create:.2f} segundos.")
-                
-                print(f"Salvando o novo índice FAISS em: {FAISS_INDEX_PATH}")
-                try:
-                    vectorstore.save_local(FAISS_INDEX_PATH)
-                    print("  Índice FAISS salvo com sucesso.")
-                except Exception as e_save:
-                    print(f"  ERRO ao salvar o novo índice FAISS: {e_save}")
-            except Exception as e_create_faiss:
-                print(f"  ERRO ao criar o índice FAISS a partir dos documentos: {e_create_faiss}")
-                return None
-        else:
-            print("Nenhum chunk foi gerado. O VectorStore não pôde ser criado.")
-            return None
+    print(f"Gerando embeddings para {len(documents_to_index)} chunks e construindo o índice FAISS...")
+    start_time = time.time()
+    vectorstore = FAISS.from_documents(
+        documents=documents_to_index,
+        embedding=embeddings_model
+    )
+    end_time = time.time()
+    print(f"Novo índice FAISS criado com sucesso em {end_time - start_time:.2f} segundos.")
+    
+    print(f"Salvando o novo índice FAISS em: {FAISS_INDEX_PATH}")
+    vectorstore.save_local(FAISS_INDEX_PATH)
+    print("Índice salvo com sucesso.")
 
     _cached_vector_store = vectorstore
     return vectorstore
-
