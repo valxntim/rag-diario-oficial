@@ -6,6 +6,7 @@ instâncias para embeddings (local) e geração (remoto).
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 
 # Importa as novas variáveis de configuração detalhadas
+# LINHA CORRIGIDA
 from .config import (
     OLLAMA_EMBEDDING_URL,
     OLLAMA_EMBEDDING_MODEL,

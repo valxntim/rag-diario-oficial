@@ -14,7 +14,7 @@ from langchain.retrievers.document_compressors import CrossEncoderReranker
 from langchain_community.cross_encoders.huggingface import HuggingFaceCrossEncoder
 # --- FIM DA CORREÇÃO DEFINITIVA ---
 
-from .config import RETRIEVER_SEARCH_K
+from src.config import RETRIEVER_SEARCH_K
 
 # Template do prompt para a resposta final do LLM (permanece o mesmo)
 PROMPT_TEMPLATE_TEXT = """

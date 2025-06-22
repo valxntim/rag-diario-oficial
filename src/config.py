@@ -24,7 +24,7 @@ VECTOR_STORE_DIR = os.path.join(DATA_DIR, "vector_store")
 #FAISS_INDEX_NAME = "faiss_index_documento_inteiro"
 #FAISS_INDEX_NAME = "faiss_index_do_dataset_enriquecido"
 # Altere esta linha no seu config.py
-FAISS_INDEX_NAME = "faiss_index_recursive_splitter_v1"
+FAISS_INDEX_NAME = "faiss_index_new"
 FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
 # URL para o modelo de Geração (servidor remoto)
@@ -49,4 +49,3 @@ EXAMPLE_QUESTIONS = [
     "Qual o nome fantasia da empresa que apresentou a proposta de cooperação à Administração Regional do Guará mencionada na Ordem de Serviço Nº 54 de 2021?",
     "Quem deverá apresentar o projeto de viabilidade simplificado?"
 ]
-
