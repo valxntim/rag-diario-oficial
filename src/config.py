@@ -28,8 +28,11 @@ FAISS_INDEX_NAME = "faiss_index_new"
 FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
 # URL para o modelo de Geração (servidor remoto)
-OLLAMA_LLM_URL = "http://164.41.75.221:11434"
-OLLAMA_LLM_MODEL = "llama4:latest"
+#OLLAMA_LLM_URL = "http://164.41.75.221:11434"
+#OLLAMA_LLM_MODEL = "llama4:latest"
+OLLAMA_LLM_URL = "http://localhost:11434"  # URL local
+OLLAMA_LLM_MODEL = "deepseek-r1:8b"  # Modelo local
+
 
 # URL para o modelo de Embedding (sua máquina local)
 # O Ollama na sua máquina local geralmente roda em 'http://localhost:11434'
@@ -37,11 +40,11 @@ OLLAMA_EMBEDDING_URL = "http://localhost:11434"
 OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"
 
 # RETRIEVER_SEARCH_K deve continuar em 1 por enquanto
-RETRIEVER_SEARCH_K = 30
+RETRIEVER_SEARCH_K = 20
 
 
-CHUNK_SIZE = 1500
-CHUNK_OVERLAP = 400
+CHUNK_SIZE = 400
+CHUNK_OVERLAP = 100
 
 
 # --- Perguntas de Exemplo para o Chatbot ---

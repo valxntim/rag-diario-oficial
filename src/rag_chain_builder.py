@@ -63,7 +63,7 @@ def build_rag_chain(llm, vector_store, force_reload=False):
         
         # --- ETAPA 3: Configurar o Compressor/Re-ranker ---
         # Agora o 'model' que passamos é do tipo que o CrossEncoderReranker espera.
-        compressor = CrossEncoderReranker(model=model, top_n=3)
+        compressor = CrossEncoderReranker(model=model, top_n=5)
         
         # --- ETAPA 4: Criar o Retriever Final com Compressão ---
         compression_retriever = ContextualCompressionRetriever(
