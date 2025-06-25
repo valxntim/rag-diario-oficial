@@ -1,15 +1,12 @@
-# Arquivo: src/main.py
-# Versão Final Simplificada - Sem wrappers
+# src/main.py
+# Versão Final, Otimizada e Corrigida
 
-# Usamos imports relativos porque estamos dentro do pacote 'src'
-from .llm_interface import get_ollama_llm, get_specialized_embeddings
-from .vector_store_manager import get_vector_store
-from .rag_chain_builder import build_rag_chain
-
-# Imports de bibliotecas externas
+# Imports de bibliotecas externas e locais
+import os
 import json
 import pandas as pd
 from tqdm import tqdm
+from datasets import Dataset
 from ragas import evaluate
 from ragas.metrics import (
     faithfulness,
@@ -17,18 +14,22 @@ from ragas.metrics import (
     context_recall,
     context_precision,
 )
-from datasets import Dataset
-import os
 
-# --- Configurações da Avaliação (sem alterações) ---
+# Imports dos seus módulos, agora com a nova função para o RAGAs
+from .llm_interface import get_ollama_llm, get_ragas_llm
+from .vector_store_manager import get_vector_store, get_embedding_model_for_processing
+from .rag_chain_builder import build_rag_chain
+
+
+# --- Configurações da Avaliação ---
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SRC_DIR)
 DATASET_FILE_PATH = os.path.join(PROJECT_ROOT, "dataset_enriquecido.jsonl")
 RESULTS_CSV_PATH = os.path.join(PROJECT_ROOT, "evaluation_results_final.csv")
-NUM_QUESTIONS_TO_TEST = 100
+NUM_QUESTIONS_TO_TEST = 1000
 
 def load_evaluation_data(file_path: str) -> list[dict]:
-    # ... (sem alterações aqui) ...
+    """Carrega os dados de avaliação de um arquivo .jsonl."""
     data = []
     if not os.path.exists(file_path):
         print(f"ERRO: Arquivo de dataset não encontrado em '{file_path}'")
@@ -42,7 +43,7 @@ def load_evaluation_data(file_path: str) -> list[dict]:
     return data
 
 def run_evaluation_task():
-    """Esta função contém a lógica de avaliação, passando os modelos diretamente para o RAGAs."""
+    """Função principal que orquestra a inicialização do RAG e a avaliação com RAGAs."""
     print("--- Iniciando Avaliação Avançada do Sistema RAG com RAGAs ---")
     
     evaluation_data = load_evaluation_data(DATASET_FILE_PATH)
@@ -52,14 +53,27 @@ def run_evaluation_task():
         print(f"ATENÇÃO: Testando as primeiras {NUM_QUESTIONS_TO_TEST} perguntas do dataset.")
         evaluation_data = evaluation_data[:NUM_QUESTIONS_TO_TEST]
 
-    # Carrega os modelos uma vez
+    # 1. Inicializa o sistema RAG completo com o LLM potente
     print("\nInicializando o sistema RAG...")
     vector_store = get_vector_store()
-    llm_for_rag = get_ollama_llm()
+    llm_for_rag = get_ollama_llm() # Carrega o 'llama4:latest' para as respostas
     qa_chain = build_rag_chain(llm_for_rag, vector_store)
+    
+    if not qa_chain:
+        print("ERRO FATAL: A cadeia RAG não pôde ser construída. Abortando a avaliação.")
+        return
+        
     print("Sistema RAG inicializado com sucesso.")
 
-    # Coleta de respostas
+    # 2. "Aquece" a cadeia RAG para evitar erro na primeira chamada da GPU
+    print("\nAquecendo o modelo da cadeia RAG para evitar erro na primeira pergunta...")
+    try:
+        _ = qa_chain.invoke("Pergunta de aquecimento para a GPU.")
+        print("Modelo aquecido com sucesso.")
+    except Exception as e:
+        print(f"AVISO: Erro durante o aquecimento (pode ser normal): {e}")
+
+    # 3. Coleta as respostas do sistema RAG para cada pergunta
     print(f"\nColetando respostas para {len(evaluation_data)} perguntas...")
     results_for_ragas = []
     for item in tqdm(evaluation_data, desc="Processando Perguntas"):
@@ -76,24 +90,24 @@ def run_evaluation_task():
             contexts = []
         results_for_ragas.append({ "question": question, "answer": answer, "contexts": contexts, "ground_truth": ground_truth })
 
-    # Executa a avaliação RAGAs
+    # 4. Prepara e executa a avaliação com RAGAs usando um LLM mais leve
     print("\nPreparando dados e executando a avaliação com RAGAs...")
     dataset = Dataset.from_list(results_for_ragas)
     
-    # --- CHAMADA SIMPLIFICADA E CORRIGIDA ---
+    # --- INÍCIO DA CORREÇÃO FINAL ---
     ragas_result = evaluate(
         dataset=dataset,
         metrics=[faithfulness, answer_relevancy, context_precision, context_recall],
-        llm=llm_for_rag, # Passamos o objeto LangChain diretamente
-        embeddings=get_specialized_embeddings(), # Passamos o objeto LangChain diretamente
+        llm=get_ragas_llm(),  # <-- USA O "LLM JUIZ" (llama3:8b), MAIS RÁPIDO E OBEDIENTE
+        embeddings=get_embedding_model_for_processing(), # Usa o embedding local que cria o índice
         raise_exceptions=False
     )
-    # ------------------------------------
+    # --- FIM DA CORREÇÃO FINAL ---
     
     print("Avaliação RAGAs concluída.")
     ragas_df = ragas_result.to_pandas()
     print("\n--- Resultados Médios da Avaliação RAGAs ---")
-    print(ragas_df[['faithfulness', 'answer_relevancy', 'context_precision', 'context_recall']].mean().round(3))
+    print(ragas_df[['faithfulness', 'answer_relevancy', 'context_precision', 'context_recall']].mean(skipna=True).round(3))
     print(f"\nSalvando resultados detalhados em '{RESULTS_CSV_PATH}'...")
     ragas_df.to_csv(RESULTS_CSV_PATH, index=False, encoding='utf-8-sig')
     print("Resultados salvos com sucesso.")

@@ -12,7 +12,7 @@ torchvision==0.16.2
 # LangChain e RAG - versões compatíveis
 langchain==0.1.16
 langchain-core==0.1.50
-langchain-community==0.0.29
+langchain-community==0.0.32
 langchain-huggingface==0.0.1
 #langchain-ollama==0.0.6
 langchain-text-splitters==0.0.1

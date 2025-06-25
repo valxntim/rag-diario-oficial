@@ -3,49 +3,40 @@
 Arquivo de Configurações Globais para o Projeto RAG.
 """
 import os
-
+# Em src/config.py
+DEVICE = "cuda" # Ou "cpu", dependendo do seu hardware
 # --- Caminhos Base ---
 SRC_ROOT = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 
 # --- Diretórios de Dados ---
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+PDF_DIRECTORY = os.path.join(DATA_DIR, "pdfs", "contratos") # Verifique se este é o caminho correto para os seus PDFs
 
-# Em src/config.py
-PDF_DIRECTORY = os.path.join(DATA_DIR, "pdfs", "contratos") # Verifique este caminho
-# Mude o nome do índice para não usar o antigo
-
-
-
-
+# --- Configuração do Vector Store (Índice FAISS) ---
+# Usamos um nome de índice claro para o modelo que estamos usando.
 VECTOR_STORE_DIR = os.path.join(DATA_DIR, "vector_store")
-# NOVO NOME para o índice FAISS para garantir que não usamos o antigo.
-#FAISS_INDEX_NAME = "faiss_index_contratos_final_ollama"
-#FAISS_INDEX_NAME = "faiss_index_documento_inteiro"
-#FAISS_INDEX_NAME = "faiss_index_do_dataset_enriquecido"
-# Altere esta linha no seu config.py
-FAISS_INDEX_NAME = "faiss_index_new"
+FAISS_INDEX_NAME = "faiss_index_nomic_embed"
 FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
-# URL para o modelo de Geração (servidor remoto)
-#OLLAMA_LLM_URL = "http://164.41.75.221:11434"
-#OLLAMA_LLM_MODEL = "llama4:latest"
-OLLAMA_LLM_URL = "http://localhost:11434"  # URL local
-OLLAMA_LLM_MODEL = "deepseek-r1:8b"  # Modelo local
+# --- Configurações dos Modelos de IA (Ollama) ---
 
+# Ambas as URLs agora apontam para o mesmo servidor remoto para consistência.
+OLLAMA_BASE_URL = "http://164.41.75.221:11434"
 
-# URL para o modelo de Embedding (sua máquina local)
-# O Ollama na sua máquina local geralmente roda em 'http://localhost:11434'
-OLLAMA_EMBEDDING_URL = "http://localhost:11434" 
-OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"
+# Modelo de Geração (LLM)
+OLLAMA_LLM_MODEL = "llama4:latest"
 
-# RETRIEVER_SEARCH_K deve continuar em 1 por enquanto
+# Modelo de Embedding (Especializado, que está no mesmo servidor)
+OLLAMA_EMBEDDING_MODEL = "nomic-embed-text:latest"
+
+# --- Configurações do Retriever ---
+# Número de documentos a serem recuperados antes do re-ranking.
 RETRIEVER_SEARCH_K = 20
 
-
+# Configurações de como o texto é dividido (opcional, pode ajustar depois)
 CHUNK_SIZE = 400
 CHUNK_OVERLAP = 100
-
 
 # --- Perguntas de Exemplo para o Chatbot ---
 EXAMPLE_QUESTIONS = [
