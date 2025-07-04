@@ -1,8 +1,7 @@
 # src/chatbot_cli.py
 """
 Interface de Linha de Comando (CLI) para interagir com o ChatBot RAG.
-Este arquivo permanece praticamente o mesmo, pois a complexidade foi abstraída
-para o rag_chain_builder.
+Permite testes interativos e qualitativos do sistema.
 """
 import time
 # Imports relativos para a estrutura do projeto
@@ -15,22 +14,22 @@ def run_chatbot():
     """
     Inicializa e executa o loop principal do chatbot.
     """
-    print("--- Iniciando ChatBot RAG do Diário Oficial ---")
+    print("--- Iniciando ChatBot RAG do Diário Oficial (Versão de Teste Interativo) ---")
 
-    # 1. Obter o Vector Store (carregar ou criar)
-    #vector_store = get_vector_store() 
-    vector_store = get_vector_store(force_recreate=True)
+    # 1. Carrega o Vector Store já existente
+    # Garante que não recriamos o índice a cada vez que o chat inicia
+    vector_store = get_vector_store() 
     if not vector_store:
         print("ERRO: Não foi possível inicializar o Vector Store. Encerrando.")
         return
 
-    # 2. Obter o LLM de Geração
+    # 2. Carrega o LLM de Geração
     llm = get_ollama_llm()
     if not llm:
         print("ERRO: Não foi possível inicializar o LLM. Encerrando.")
         return
 
-    # 3. Construir a Cadeia RAG (agora usará o MultiQueryRetriever por baixo dos panos)
+    # 3. Constrói a cadeia RAG (usando a versão atual do builder, seja ela simples ou avançada)
     qa_chain = build_rag_chain(llm, vector_store)
     if not qa_chain:
         print("ERRO: Não foi possível construir a cadeia RAG. Encerrando.")
@@ -53,7 +52,7 @@ def run_chatbot():
         if not user_question.strip():
             continue
 
-        print(f"Processando sua pergunta com MultiQueryRetriever: '{user_question}'...")
+        print(f"Processando sua pergunta: '{user_question}'...")
         start_time_rag = time.time()
         try:
             result = qa_chain.invoke({"query": user_question})
@@ -66,27 +65,17 @@ def run_chatbot():
             print("\nDocumentos Fonte Recuperados:")
             source_documents = result.get("source_documents", [])
             if source_documents:
-                # O MultiQueryRetriever pode retornar muitos documentos, vamos mostrar os metadados dos primeiros
-                unique_sources = {}
-                for doc_source in source_documents:
-                    source_key = (
-                        doc_source.metadata.get('source', 'N/A'),
-                        doc_source.metadata.get('page', -1)
-                    )
-                    if source_key not in unique_sources:
-                        unique_sources[source_key] = doc_source
-                
-                print(f"  Fontes únicas recuperadas: {len(unique_sources)}")
-                for i, doc_source in enumerate(list(unique_sources.values())[:5]): # Mostra até 5 fontes únicas
-                    print(f"  Fonte {i+1}: {doc_source.metadata.get('source', 'N/A')}, Pág: {doc_source.metadata.get('page', -1) + 1}")
-                    # Descomente para ver o conteúdo do chunk
-                    # print(f"      Conteúdo: \"{doc_source.page_content[:200]}...\"")
+                for i, doc in enumerate(source_documents):
+                    source = doc.metadata.get('source', 'N/A')
+                    page = doc.metadata.get('page', -1)
+                    print(f"  Fonte {i+1}: {os.path.basename(source)}, Pág: {page}")
+                    # print(f"    Conteúdo: \"{doc.page_content[:200]}...\"") # Descomente para ver o conteúdo
             else:
                 print("  Nenhum documento fonte retornado.")
 
         except Exception as e_rag_query:
             print(f"ERRO ao processar a pergunta com a cadeia RAG: {e_rag_query}")
 
-# O main.py chamará esta função
+# Para rodar este arquivo diretamente: python3 -m src.chatbot_cli
 if __name__ == "__main__":
     run_chatbot()
