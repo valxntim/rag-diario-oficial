@@ -18,10 +18,10 @@ from src.vector_store_manager import get_vector_store
 from src.rag_chain_builder import build_rag_chain
 
 # --- Configurações da Avaliação ---
-DATASET_FILE_PATH = "./dataset_para_teste.jsonl"
+DATASET_FILE_PATH = "./dataset_verificado_final.jsonl"
 #DATASET_FILE_PATH = "./dataset_enriquecido.jsonl"
-RESULTS_CSV_PATH = "./evaluation_results_baseline.csv" # Novo nome para o arquivo de resultados
-NUM_QUESTIONS_TO_TEST = 100 # Vamos testar um número maior para ter uma boa amostra
+RESULTS_CSV_PATH = "./evaluation_results_final.csv" # Novo nome para o arquivo de resultados
+NUM_QUESTIONS_TO_TEST = 200 # Vamos testar um número maior para ter uma boa amostra
 
 def extract_monetary_value(text: str) -> str or None:
     """Extrai e normaliza um valor monetário de uma string."""

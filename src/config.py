@@ -8,7 +8,7 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 
 # --- Diretórios de Dados ---
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
-PDF_DIRECTORY = os.path.join(DATA_DIR, "pdfs", "contratos_test")
+PDF_DIRECTORY = os.path.join(DATA_DIR, "pdfs", "contratos")
 
 # --- Configuração do Vector Store (Índice FAISS) ---
 # Nome descritivo para o índice desta fase de testes
@@ -16,7 +16,7 @@ VECTOR_STORE_DIR = os.path.join(DATA_DIR, "vector_store")
 #FAISS_INDEX_NAME = "faiss_index_baseline_recursive_750_150" # Nome claro com os parâmetros
 
 
-FAISS_INDEX_NAME = "faiss_index_chunk750_overlap150_test" # O nome reflete os parâmetros!
+FAISS_INDEX_NAME = "faiss_index_chunk256_overlap64" # O nome reflete os parâmetros!
 FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
 # --- Configurações dos Modelos de IA (Ollama) ---
@@ -34,7 +34,7 @@ OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"
 
 
 # Tamanho dos chunks e sobreposição. Valores menores criam chunks mais focados.
-# Exemplo para o Teste 1.1
-CHUNK_SIZE = 750
-CHUNK_OVERLAP = 150
-RETRIEVER_SEARCH_K = 5
+# Exemplo para o Teste.1
+CHUNK_SIZE = 256
+CHUNK_OVERLAP = 64
+RETRIEVER_SEARCH_K = 10
