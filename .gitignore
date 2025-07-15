@@ -18,9 +18,11 @@ Thumbs.db
 # É CRUCIAL não enviar dados sensíveis ou arquivos muito grandes para o Git.
 # Seus PDFs e o índice FAISS podem ser grandes e/ou conter dados que você não quer no repositório.
 # Se você decidir não versioná-los, adicione as seguintes linhas:
-data/
+data/vector_store
+data/pdfs/contratos
 csv/
 others/
+garbage/
 # Ou, se quiser ser mais específico:
 # data/pdfs/pessoal/
 # data/pdfs/contratos/
