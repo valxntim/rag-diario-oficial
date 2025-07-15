@@ -1,5 +1,5 @@
 # 🤖 Sistema RAG para Análise do Diário Oficial
-
+SLIDE[https://www.canva.com/design/DAGtMTcSSS0/QNUv00OOUQDFkRnVt4c4rw/edit?utm_content=DAGtMTcSSS0&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton]
 Este repositório contém a implementação de um sistema de **Geração Aumentada por Recuperação (RAG)** projetado para extrair informações de documentos complexos e não estruturados, como o Diário Oficial do Distrito Federal (DODF).
 
 O objetivo deste projeto é investigar e avaliar a eficácia de uma arquitetura RAG de linha de base ("baseline") para democratizar o acesso a informações públicas, transformando o denso conteúdo dos Diários em um formato de perguntas e respostas acessível ao cidadão comum.
