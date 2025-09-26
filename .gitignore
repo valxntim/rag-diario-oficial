@@ -23,6 +23,10 @@ data/pdfs/contratos
 csv/
 others/
 garbage/
+data/
+hello-ngrok/
+models/
+*.jsonl
 # Ou, se quiser ser mais específico:
 # data/pdfs/pessoal/
 # data/pdfs/contratos/

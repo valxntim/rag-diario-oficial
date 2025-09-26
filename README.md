@@ -72,3 +72,14 @@ Além disso, ele gerará um arquivo chamado `evaluation_results_baseline.csv` co
 * `retrieved_contexts`: **A coluna mais importante para análise!** Ela contém os trechos de texto exatos que o sistema recuperou para formular a resposta, permitindo diagnosticar falhas de busca.
 
 Este arquivo CSV é a principal evidência gerada por este projeto, permitindo uma análise profunda das limitações e do potencial da arquitetura RAG base.
+
+
+
+Sua Ação	Comando	Resultado
+Criar uma nova sessão	screen -S tcc	Entra em uma nova "sala" virtual.
+Sair da sessão (deixando-a rodar)	Ctrl+A, depois d	Você volta ao seu terminal normal, o processo continua.
+Voltar para a sessão	screen -r tcc	Você entra novamente na "sala" que deixou rodando.
+Fechar a sessão (depois que tudo acabou)	Digite exit e aperte Enter	A "sala" é fechada permanentemente.
+
+screen -r emb
+screen -r tcc

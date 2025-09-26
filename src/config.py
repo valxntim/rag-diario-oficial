@@ -1,40 +1,99 @@
-# src/config.py (Versão Corrigida para a Análise do "Fusca")
-
 import os
 
+# ===========================
 # --- Caminhos Base ---
+# ===========================
+
+# Diretório do arquivo config.py (SRC_ROOT) e do projeto (PROJECT_ROOT)
 SRC_ROOT = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 
+# ===========================
 # --- Diretórios de Dados ---
+# ===========================
+
+# Pasta principal de dados
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
-PDF_DIRECTORY = os.path.join(DATA_DIR, "pdfs", "contratos")
+# Pasta onde encontrar seus PDFs originais para indexar
+PDF_DIRECTORY = os.path.join(DATA_DIR, "pdfs", "contratos_controlado")
 
-# --- Configuração do Vector Store (Índice FAISS) ---
-# Nome descritivo para o índice desta fase de testes
+# ===========================
+# --- Dataset de Avaliação ---
+# ===========================
+
+# Caminho para o JSONL com perguntas e respostas de referência
+DATASET_FILE_PATH = os.path.join(DATA_DIR, "benchmark_final_valor.jsonl")
+
+# ===========================
+# --- Configuração do Vector Store (FAISS) ---
+# ===========================
+
+# Diretório e nome do índice FAISS
 VECTOR_STORE_DIR = os.path.join(DATA_DIR, "vector_store")
-#FAISS_INDEX_NAME = "faiss_index_baseline_recursive_750_150" # Nome claro com os parâmetros
-
-
-FAISS_INDEX_NAME = "faiss_index_chunk256_overlap64" # O nome reflete os parâmetros!
+FAISS_INDEX_NAME = "faiss_index_chunk800_base_controlada"
 FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
+# ===========================
 # --- Configurações dos Modelos de IA (Ollama) ---
+# ===========================
 
-# URL para o modelo de Geração (servidor remoto)
-OLLAMA_LLM_URL = "http://164.41.75.221:11434"
-OLLAMA_LLM_MODEL = "llama4:latest"
+# Parâmetros do LLM (geração, ex: Llama 3/4 via Ollama)
+#OLLAMA_LLM_URL = "http://localhost:11434"    # Mude para o IP/porta de outro servidor se necessário
+#OLLAMA_LLM_MODEL = "llama3:latest"           # Altere conforme o modelo local disponível (veja com 'ollama list')
 
-# URL para o modelo de Embedding (sua máquina local)
-# Lembrete: Seu serviço Ollama local precisa estar rodando para que isso funcione!
+
+
+# Parâmetros do modelo de embedding via Ollama (caso use Ollama para embeddings)
+#OLLAMA_EMBEDDING_URL = "http://localhost:11434"  # MESMO endereço do Ollama rodando modelo para embeddings
+#OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"   # Ou outro, ex: "nomic-embed-text:latest"
+
+# ===========================
+# --- Parâmetros do Pipeline RAG ---
+# ===========================
+
+CHUNK_SIZE = 800            # Tamanho do chunk de texto para indexação
+CHUNK_OVERLAP = 0         # Sobreposição dos chunks
+RETRIEVER_SEARCH_K = 3    # Top K documentos mais similares a serem recuperados por consulta
+#NUM_QUESTIONS_TO_TEST = 8 # Limita quantidade de perguntas em avaliações automáticas (ajuste se quiser debugar rápido)
+
+# ===========================
+# --- Backend de Embeddings ---
+# ===========================
+
+# Escolha entre "ollama" para usar embeddings servidos via Ollama, ou "huggingface" para usar modelos HuggingFace diretamente em Python
+# Exemplo para HuggingFace (BERT jurídico):
+#EMBEDDING_BACKEND = "huggingface"
+HF_EMBEDDING_MODEL = "ulysses-camara/legal-bert-pt-br"
+
+# Exemplo para Ollama (descomente, se for servir embeddings pelo Ollama):
+EMBEDDING_BACKEND = "ollama"
+#OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"
+OLLAMA_EMBEDDING_MODEL = "bge-m3:latest"
 OLLAMA_EMBEDDING_URL = "http://localhost:11434"
-OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"
 
-# --- Parâmetros de Teste para o RAG "Fusca" ---
+# ========== FIM (modifique apenas acima, se possível) ==========
 
 
-# Tamanho dos chunks e sobreposição. Valores menores criam chunks mais focados.
-# Exemplo para o Teste.1
-CHUNK_SIZE = 256
-CHUNK_OVERLAP = 64
-RETRIEVER_SEARCH_K = 10
+#FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
+
+# --- Configurações dos Modelos de IA (Ollama) ---
+#OLLAMA_LLM_URL = "http://164.41.75.221:11434"
+#OLLAMA_LLM_MODEL = "llama4:latest"
+
+OLLAMA_LLM_URL = "http://localhost:11434"  # Default do servidor Ollama
+OLLAMA_LLM_MODEL = "llama3.1:8b-32k"       # Novo tag criado via Modelfile
+
+# --- MUDANÇA 1: Aponte para o novo modelo de embedding ---
+# URL para o modelo de Embedding (agora usando o remoto também)
+#OLLAMA_EMBEDDING_URL = "http://164.41.75.221:11434" 
+#OLLAMA_EMBEDDING_MODEL = "nomic-embed-text:latest"  # <-- NOSSO NOVO CANDIDATO
+
+
+
+#OLLAMA_EMBEDDING_URL = "http://localhost:11434"
+#OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"
+#OLLAMA_EMBEDDING_MODEL = "paraphrase-multilingual:278m-mpnet-base-v2-fp16" 
+
+#EMBEDDING_BACKEND = "ollama"
+#OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"
+#OLLAMA_EMBEDDING_URL = "http://localhost:11434"
