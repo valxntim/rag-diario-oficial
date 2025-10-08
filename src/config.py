@@ -30,7 +30,7 @@ DATASET_FILE_PATH = os.path.join(DATA_DIR, "benchmark_final_valor.jsonl")
 
 # Diretório e nome do índice FAISS
 VECTOR_STORE_DIR = os.path.join(DATA_DIR, "vector_store")
-FAISS_INDEX_NAME = "faiss_index_chunk800_base_controlada"
+FAISS_INDEX_NAME = "faiss_index_chunk600_base_controlada"
 FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
 # ===========================
@@ -51,9 +51,9 @@ FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 # --- Parâmetros do Pipeline RAG ---
 # ===========================
 
-CHUNK_SIZE = 800            # Tamanho do chunk de texto para indexação
-CHUNK_OVERLAP = 0         # Sobreposição dos chunks
-RETRIEVER_SEARCH_K = 3    # Top K documentos mais similares a serem recuperados por consulta
+CHUNK_SIZE = 600            # Tamanho do chunk de texto para indexação
+CHUNK_OVERLAP = 0        # Sobreposição dos chunks
+RETRIEVER_SEARCH_K = 5    # Top K documentos mais similares a serem recuperados por consulta
 #NUM_QUESTIONS_TO_TEST = 8 # Limita quantidade de perguntas em avaliações automáticas (ajuste se quiser debugar rápido)
 
 # ===========================
@@ -81,7 +81,10 @@ OLLAMA_EMBEDDING_URL = "http://localhost:11434"
 #OLLAMA_LLM_MODEL = "llama4:latest"
 
 OLLAMA_LLM_URL = "http://localhost:11434"  # Default do servidor Ollama
-OLLAMA_LLM_MODEL = "llama3.1:8b-32k"       # Novo tag criado via Modelfile
+#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"       # Novo tag criado via Modelfile
+# Em src/llm_interface.py ou onde você define o modelo
+#OLLAMA_LLM_MODEL = "qwen2.5:latest"  # Mude de llama3.1:8b-32k
+OLLAMA_LLM_MODEL = "command-r:latest"
 
 # --- MUDANÇA 1: Aponte para o novo modelo de embedding ---
 # URL para o modelo de Embedding (agora usando o remoto também)

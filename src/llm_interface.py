@@ -96,6 +96,7 @@ def get_llm(force_reload=False):
         llm = OllamaLLM(
             base_url=OLLAMA_LLM_URL,
             model=OLLAMA_LLM_MODEL,
+            num_ctx=60000,#131072
             temperature=0
         )
         _ = llm.invoke("Olá! Teste de LLM. Responda 'ok'.")

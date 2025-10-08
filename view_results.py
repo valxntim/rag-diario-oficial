@@ -1,367 +1,212 @@
-
 import streamlit as st
 import json
-import pandas as pd
 from pathlib import Path
+import glob
+from typing import List, Dict, Any
+import re
+import datetime
 
-# Page configuration
-st.set_page_config(
-    page_title="RAG Evaluation Results Viewer",
-    page_icon="📊",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+st.set_page_config(page_title="RAG Results (Simple)", page_icon="📊", layout="wide")
 
-# Custom CSS for better styling
+# Minimal styling for readable scroll areas
 st.markdown("""
 <style>
-.metric-container {
-    background-color: #f0f2f6;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin: 0.5rem 0;
+.box-mono {
+  background-color: #111827; color: #e5e7eb;
+  padding: 0.75rem; border-radius: 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9em; line-height: 1.4; white-space: pre-wrap; border: 1px solid #374151;
 }
-
-.success-box {
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
-    padding: 0.75rem;
-    border-radius: 0.25rem;
-    margin: 0.5rem 0;
-}
-
-.error-box {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
-    padding: 0.75rem;
-    border-radius: 0.25rem;
-    margin: 0.5rem 0;
-}
-
-.context-box {
-    background-color: #2c3e50;
-    border-left: 4px solid #3498db;
-    color: #ecf0f1;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border-radius: 0.25rem;
-    font-family: monospace;
-    font-size: 0.9em;
-    line-height: 1.4;
-}
-
-.extrato-box {
-    background-color: #34495e;
-    border: 1px solid #7f8c8d;
-    color: #ecf0f1;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border-radius: 0.25rem;
-    font-family: monospace;
-    font-size: 0.9em;
-    line-height: 1.4;
-    white-space: pre-wrap;
-}
-
-.context-box:hover, .extrato-box:hover {
-    background-color: #1a252f;
-    transition: background-color 0.3s ease;
-}
+.scroll { max-height: 420px; overflow-y: auto; }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("📊 RAG Evaluation Results Viewer")
+st.title("📊 RAG Results (Simple)")
 st.markdown("---")
 
+# -------- Helpers --------
+def extract_numeric_difference(diff_value: Any) -> float:
+    """
+    Parse numeric difference from diferenca_valor.
+    No 'exact match' special-casing; non-numeric strings yield 0.0.
+    """
+    if diff_value is None:
+        return 0.0
+    if isinstance(diff_value, (int, float)):
+        return float(diff_value)
+    if isinstance(diff_value, str):
+        nums = re.findall(r'[\d.,]+', diff_value)
+        if nums:
+            try:
+                return float(nums[0].replace(',', ''))
+            except Exception:
+                return 0.0
+    return 0.0
+
+def context_count(rec: Dict[str, Any]) -> int:
+    ctx = rec.get("contextos_recuperados", [])
+    return len(ctx) if isinstance(ctx, list) else 0
+
+# -------- Cached IO --------
 @st.cache_data
-def load_jsonl(path):
-    """Load JSONL file and return list of records"""
-    try:
-        records = []
-        with open(path, 'r', encoding='utf-8') as f:
-            for line_num, line in enumerate(f, 1):
-                try:
-                    record = json.loads(line.strip())
-                    record['_line_number'] = line_num
-                    records.append(record)
-                except json.JSONDecodeError as e:
-                    st.warning(f"Error parsing line {line_num}: {e}")
-                    continue
-        return records
-    except FileNotFoundError:
-        st.error(f"File not found: {path}")
-        return []
-    except Exception as e:
-        st.error(f"Error loading file: {e}")
-        return []
+def list_jsonl_files() -> List[str]:
+    # Only from ./results folder
+    return sorted(glob.glob("results/*.jsonl"))
 
-def calculate_statistics(records):
-    """Calculate evaluation statistics"""
-    if not records:
-        return {}
+@st.cache_data
+def load_jsonl(path: str) -> List[Dict[str, Any]]:
+    recs: List[Dict[str, Any]] = []
+    with open(path, "r", encoding="utf-8") as f:
+        for i, line in enumerate(f, 1):
+            s = line.strip()
+            if not s:
+                continue
+            try:
+                rec = json.loads(s)
+                rec["_line_number"] = i
+                recs.append(rec)
+            except json.JSONDecodeError as e:
+                # Keep going; mark parse error as a record for debugging
+                recs.append({"_line_number": i, "_parse_error": str(e)})
+    return recs
 
+def compute_stats(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     total = len(records)
-    correct = sum(1 for r in records if r.get('acerto', False))
+    correct = sum(1 for r in records if bool(r.get("acerto", False)))
     incorrect = total - correct
-    accuracy = (correct / total) * 100 if total > 0 else 0
+    accuracy = (correct / total * 100.0) if total else 0.0
 
-    # Value differences statistics
-    value_diffs = [r.get('diferenca_valor', 0) for r in records if r.get('diferenca_valor') is not None]
-    avg_diff = sum(value_diffs) / len(value_diffs) if value_diffs else 0
-
-    # PDF distribution
-    pdf_counts = {}
-    for r in records:
-        pdf = r.get('pdf', 'Unknown')
-        pdf_counts[pdf] = pdf_counts.get(pdf, 0) + 1
+    diffs = [extract_numeric_difference(r.get("diferenca_valor")) for r in records]
+    avg_diff = (sum(diffs) / len(diffs)) if diffs else 0.0
+    max_diff = max(diffs) if diffs else 0.0
 
     return {
-        'total': total,
-        'correct': correct,
-        'incorrect': incorrect,
-        'accuracy': accuracy,
-        'avg_diff': avg_diff,
-        'pdf_counts': pdf_counts,
-        'value_diffs': value_diffs
+        "total": total,
+        "correct": correct,
+        "incorrect": incorrect,
+        "accuracy": accuracy,
+        "avg_diff": avg_diff,
+        "max_diff": max_diff,
     }
 
-def display_record(record, index):
-    """Display a single evaluation record"""
-    record_id = record.get('id_versao_pergunta', f'Record {index}')
-    is_correct = record.get('acerto', False)
+def render_record(r: Dict[str, Any], idx: int):
+    rec_id = r.get("id_versao_pergunta", f"rec-{idx}")
+    is_correct = bool(r.get("acerto", False))
+    pdf_name = str(r.get("pdf", "N/A"))
+    sistema = str(r.get("sistema", "N/A"))
+    cntx = context_count(r)
 
-    # Main record container
-    with st.container():
-        # Header with result indicator
-        col1, col2, col3 = st.columns([3, 1, 1])
+    c1, c2, c3, c4 = st.columns([3,1,1,1])
+    with c1:
+        st.markdown(f"### 📝 `{rec_id}`")
+    with c2:
+        st.write("✅ Correto" if is_correct else "❌ Incorreto")
+    with c3:
+        st.write(f"📄 {cntx} contextos")
+    with c4:
+        short_pdf = pdf_name if len(pdf_name) <= 22 else pdf_name[:22] + "…"
+        st.write(f"🗂️ {short_pdf}")
 
-        with col1:
-            st.markdown(f"### 📝 {record_id}")
+    st.markdown("**🤔 Pergunta:**")
+    st.write(r.get("pergunta", "N/A"))
 
-        with col2:
-            if is_correct:
-                st.markdown('<div class="success-box">✅ CORRETO</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("**🎯 Resposta Esperada:**")
+        st.markdown(f'<div class="box-mono">{r.get("resposta_esperada","N/A")}</div>', unsafe_allow_html=True)
+    with c2:
+        st.markdown("**🤖 Resposta Gerada:**")
+        st.markdown(f'<div class="box-mono scroll">{r.get("resposta_gerada","N/A")}</div>', unsafe_allow_html=True)
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        num = extract_numeric_difference(r.get("diferenca_valor"))
+        st.info(f"💰 Diferença numérica: R$ {num:,.2f}")
+    with c2:
+        st.info(f"⚙️ Sistema: {sistema}")
+    with c3:
+        ts = r.get("timestamp", 0)
+        if ts:
+            dt = datetime.datetime.fromtimestamp(ts)
+            st.info(f"⏰ {dt.strftime('%H:%M:%S')}")
+
+    c1, c2 = st.columns(2)
+    with c1:
+        with st.expander("📄 Extrato (completo)", expanded=False):
+            extrato = r.get("extrato", "Não disponível")
+            if not isinstance(extrato, str):
+                extrato = json.dumps(extrato, ensure_ascii=False, indent=2)
+            st.markdown(f'<div class="box-mono scroll">{extrato}</div>', unsafe_allow_html=True)
+    with c2:
+        with st.expander("🔍 Contextos Recuperados (completo)", expanded=False):
+            ctx = r.get("contextos_recuperados", [])
+            if isinstance(ctx, list) and ctx:
+                for i, c in enumerate(ctx, 1):
+                    st.markdown(f"**Contexto {i}:**")
+                    if not isinstance(c, str):
+                        c = json.dumps(c, ensure_ascii=False, indent=2)
+                    st.markdown(f'<div class="box-mono scroll">{c}</div>', unsafe_allow_html=True)
             else:
-                st.markdown('<div class="error-box">❌ INCORRETO</div>', unsafe_allow_html=True)
+                st.warning("⚠️ Nenhum contexto recuperado disponível")
 
-        with col3:
-            pdf_name = record.get('pdf', 'N/A')[:20] + '...' if len(record.get('pdf', '')) > 20 else record.get('pdf', 'N/A')
-            st.info(f"📄 {pdf_name}")
+    with st.expander("🧾 JSON bruto", expanded=False):
+        st.code(json.dumps(r, ensure_ascii=False, indent=2), language="json")
 
-        # Question and answers
-        st.markdown("**🤔 Pergunta:**")
-        st.markdown(f"> {record.get('pergunta', 'N/A')}")
+    st.markdown("---")
 
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.markdown("**🎯 Resposta Esperada:**")
-            expected = record.get('resposta_esperada', 'N/A')
-            st.markdown(f'<div class="success-box">{expected}</div>', unsafe_allow_html=True)
-
-        with col2:
-            st.markdown("**🤖 Resposta Gerada:**")
-            generated = record.get('resposta_gerada', 'N/A')
-            box_class = "success-box" if is_correct else "error-box"
-            st.markdown(f'<div class="{box_class}">{generated}</div>', unsafe_allow_html=True)
-
-        # Value difference if available
-        if record.get('diferenca_valor') is not None:
-            diff_val = record.get('diferenca_valor', 0)
-            st.metric("💰 Diferença de Valor", f"R$ {diff_val:,.2f}")
-
-        # Expandable sections for detailed content
-        with st.expander("📄 Ver Extrato do Documento", expanded=False):
-            extrato = record.get('extrato', 'Não disponível')
-            st.markdown(f'<div class="extrato-box">{extrato}</div>', unsafe_allow_html=True)
-
-        with st.expander("🔍 Ver Contextos Recuperados", expanded=False):
-            contextos = record.get('contextos_recuperados', [])
-            if contextos:
-                for i, contexto in enumerate(contextos):
-                    st.markdown(f"**Contexto {i+1}:**")
-                    st.markdown(f'<div class="context-box">{contexto}</div>', unsafe_allow_html=True)
-            else:
-                st.info("Nenhum contexto recuperado disponível")
-
-        st.markdown("---")
-
-# Sidebar for file loading and controls
-with st.sidebar:
-    st.header("🔧 Controles")
-
-    # File input
-    datafile = st.text_input(
-        "📁 Arquivo JSONL", 
-        value="./evaluation_results_hibrida_1300_200_1.jsonl",
-        help="Caminho para o arquivo JSONL com os resultados"
-    )
-
-    load_button = st.button("🔄 Carregar Arquivo", type="primary")
-
-    if load_button and datafile:
-        # Clear cache and load new file
-        load_jsonl.clear()
-        st.session_state['records'] = load_jsonl(datafile)
-        st.session_state['file_loaded'] = True
-        st.success("Arquivo carregado!")
-
-# Initialize session state
-if 'records' not in st.session_state:
-    st.session_state['records'] = []
-if 'file_loaded' not in st.session_state:
-    st.session_state['file_loaded'] = False
-
-# Load default file on startup
-if not st.session_state['file_loaded'] and Path(datafile if 'datafile' in locals() else "./evaluation_results_final.jsonl").exists():
-    st.session_state['records'] = load_jsonl(datafile if 'datafile' in locals() else "./evaluation_results_final.jsonl")
-    st.session_state['file_loaded'] = True
-
-records = st.session_state.get('records', [])
-
-if records:
-    # Calculate and display statistics
-    stats = calculate_statistics(records)
-
-    st.header("📊 Estatísticas Gerais")
-
-    # Main metrics
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        st.metric("📝 Total de Registros", stats['total'])
-
-    with col2:
-        st.metric("✅ Respostas Corretas", stats['correct'])
-
-    with col3:
-        st.metric("❌ Respostas Incorretas", stats['incorrect'])
-
-    with col4:
-        st.metric("🎯 Precisão", f"{stats['accuracy']:.1f}%")
-
-    # Additional statistics
-    if stats['value_diffs']:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("💰 Diferença Média de Valor", f"R$ {stats['avg_diff']:.2f}")
-        with col2:
-            st.metric("📄 Arquivos PDF Únicos", len(stats['pdf_counts']))
-
-    # Sidebar filters
-    with st.sidebar:
-        st.header("🔍 Filtros")
-
-        # Filter by correctness
-        show_filter = st.selectbox(
-            "Mostrar:",
-            ["Todos", "Apenas Corretos", "Apenas Incorretos"],
-            index=0
-        )
-
-        # Filter by PDF
-        pdf_files = ["Todos"] + list(stats['pdf_counts'].keys())
-        selected_pdf = st.selectbox("Filtrar por PDF:", pdf_files, index=0)
-
-        # Search in questions
-        search_query = st.text_input("🔎 Buscar na pergunta:", "")
-
-        # Value difference filter
-        if stats['value_diffs']:
-            show_value_diff = st.checkbox("Apenas com diferença de valor")
-        else:
-            show_value_diff = False
-
-    # Apply filters
-    filtered_records = records.copy()
-
-    if show_filter == "Apenas Corretos":
-        filtered_records = [r for r in filtered_records if r.get('acerto', False)]
-    elif show_filter == "Apenas Incorretos":
-        filtered_records = [r for r in filtered_records if not r.get('acerto', False)]
-
-    if selected_pdf != "Todos":
-        filtered_records = [r for r in filtered_records if r.get('pdf') == selected_pdf]
-
-    if search_query:
-        filtered_records = [r for r in filtered_records 
-                          if search_query.lower() in r.get('pergunta', '').lower()]
-
-    if show_value_diff:
-        filtered_records = [r for r in filtered_records 
-                          if r.get('diferenca_valor') is not None]
-
-    # Display filtered results
-    st.header(f"📋 Resultados ({len(filtered_records)} de {len(records)})")
-
-    if filtered_records:
-        # Pagination
-        items_per_page = st.selectbox("Registros por página:", [5, 10, 20, 50], index=1)
-        total_pages = (len(filtered_records) + items_per_page - 1) // items_per_page
-
-        if total_pages > 1:
-            page = st.selectbox("Página:", range(1, total_pages + 1), index=0)
-            start_idx = (page - 1) * items_per_page
-            end_idx = min(start_idx + items_per_page, len(filtered_records))
-            page_records = filtered_records[start_idx:end_idx]
-
-            st.info(f"Mostrando registros {start_idx + 1}-{end_idx} de {len(filtered_records)}")
-        else:
-            page_records = filtered_records
-
-        # Display records
-        for i, record in enumerate(page_records):
-            display_record(record, start_idx + i + 1 if 'start_idx' in locals() else i + 1)
-
-        # Export options
-        with st.sidebar:
-            st.header("📤 Exportar")
-            if st.button("💾 Baixar Dados Filtrados (CSV)"):
-                # Create a simplified dataframe for export
-                export_data = []
-                for record in filtered_records:
-                    export_data.append({
-                        'ID': record.get('id_versao_pergunta', ''),
-                        'Pergunta': record.get('pergunta', ''),
-                        'Resposta_Esperada': record.get('resposta_esperada', ''),
-                        'Resposta_Gerada': record.get('resposta_gerada', ''),
-                        'Acerto': record.get('acerto', False),
-                        'PDF': record.get('pdf', ''),
-                        'Diferenca_Valor': record.get('diferenca_valor', 0)
-                    })
-
-                df = pd.DataFrame(export_data)
-                csv = df.to_csv(index=False)
-                st.download_button(
-                    label="📥 Download CSV",
-                    data=csv,
-                    file_name="evaluation_results_filtered.csv",
-                    mime="text/csv"
-                )
-    else:
-        st.warning("Nenhum registro encontrado com os filtros aplicados.")
-
+# -------- UI --------
+files = list_jsonl_files()
+if not files:
+    st.warning("📂 Nenhum JSONL encontrado em ./results")
 else:
-    st.info("👆 Carregue um arquivo JSONL usando a barra lateral para começar.")
+    selected = st.selectbox("📁 Arquivo:", options=files, format_func=lambda p: Path(p).name)
+    records = load_jsonl(selected)
 
-    # Show example of expected format
-    with st.expander("📖 Formato de arquivo esperado"):
-        st.markdown("""
-        O arquivo JSONL deve conter uma linha por registro, com a seguinte estrutura:
+    # New correctness filter
+    show_filter = st.selectbox("Mostrar:", ["Todos", "Corretos", "Incorretos"], index=0)
 
-        ```json
-        {
-            "id_versao_pergunta": "id_da_pergunta",
-            "pergunta": "Qual é a pergunta?",
-            "resposta_esperada": "Resposta esperada",
-            "resposta_gerada": "Resposta gerada pelo modelo",
-            "acerto": true,
-            "pdf": "nome_do_arquivo.pdf",
-            "extrato": "Texto extraído do documento...",
-            "contextos_recuperados": ["contexto1", "contexto2"],
-            "diferenca_valor": 0.0
-        }
-        ```
-        """)
+    # Basic text search
+    q = st.text_input("🔎 Buscar em pergunta/resposta/id/pdf/sistema:", "")
+    items_per_page = st.selectbox("Registros por página:", [5, 10, 20, 50, 100], index=2)
+    page = st.number_input("Página:", min_value=1, step=1, value=1)
+
+    # Text filter
+    def matches(r: Dict[str, Any]) -> bool:
+        if not q:
+            return True
+        s = q.lower()
+        fields = [
+            r.get("pergunta",""),
+            r.get("resposta_gerada",""),
+            r.get("id_versao_pergunta",""),
+            r.get("pdf",""),
+            r.get("sistema",""),
+        ]
+        return any(s in str(x).lower() for x in fields)
+
+    filtered = [r for r in records if matches(r)]
+
+    # Apply correctness filter
+    if show_filter == "Corretos":
+        filtered = [r for r in filtered if bool(r.get("acerto", False))]
+    elif show_filter == "Incorretos":
+        filtered = [r for r in filtered if not bool(r.get("acerto", False))]
+
+    # Simple stats
+    stats = compute_stats(filtered)
+    c1, c2, c3, c4, c5 = st.columns(5)
+    c1.metric("📝 Total", stats["total"])
+    c2.metric("✅ Corretos", stats["correct"])
+    c3.metric("❌ Incorretos", stats["incorrect"])
+    c4.metric("🎯 Precisão", f"{stats['accuracy']:.1f}%")
+    c5.metric("💰 Dif. Média", f"R$ {stats['avg_diff']:.2f}")
+
+    # Pagination
+    total_pages = max(1, (len(filtered) + items_per_page - 1) // items_per_page)
+    page = min(page, total_pages)
+    start = (page - 1) * items_per_page
+    end = min(start + items_per_page, len(filtered))
+    st.info(f"Mostrando {start+1}–{end} de {len(filtered)} | Página {page}/{total_pages}")
+
+    for i, rec in enumerate(filtered[start:end], start=start + 1):
+        render_record(rec, i)

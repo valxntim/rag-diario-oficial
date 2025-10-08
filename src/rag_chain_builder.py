@@ -20,13 +20,12 @@ Instruções:
 
 FORMATO OBRIGATÓRIO DA RESPOSTA:
 - Se encontrou o valor:
-  "Pergunta: [pergunta original]
+  "
   Valor encontrado: R$ [valor exato]
-  Contexto correspondente: [número do contexto]
-  Trecho encontrado: "[trecho original]""
+  Trecho encontrado: "[trecho original]
+  "
 
 - Se não encontrou:
-  "Pergunta: [pergunta original]
   A informação solicitada não foi encontrada no contexto fornecido."
 
 **Contextos fornecidos:**
@@ -39,7 +38,7 @@ FORMATO OBRIGATÓRIO DA RESPOSTA:
 
 _cached_rag_chain = None
 
-def build_rag_chain_fixed(llm, vector_store, use_neighbor_retriever=False, k=1, neighbors=0, force_reload=False):
+def build_rag_chain_fixed(llm, vector_store, use_neighbor_retriever=True, k=1, neighbors=1, force_reload=False):
     """
     Constrói cadeia RAG usando componentes CORRIGIDOS
     
@@ -114,9 +113,9 @@ def build_rag_chain(llm, vector_store, force_reload=False):
     return build_rag_chain_fixed(
         llm=llm,
         vector_store=vector_store,
-        use_neighbor_retriever=False,
+        use_neighbor_retriever=True,
         k=RETRIEVER_SEARCH_K,
-        neighbors=0,
+        neighbors=1,
         force_reload=force_reload
     )
 
