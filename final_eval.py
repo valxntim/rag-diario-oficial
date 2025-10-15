@@ -8,11 +8,11 @@ from tqdm import tqdm
 from collections import defaultdict
 
 # --- CONFIGURAÇÕES ---
-MAX_WORKERS = 4
+MAX_WORKERS = 2
 PER_TASK_TIMEOUT = 180
 MAX_ATTEMPTS = 2
-TARGET_TOTAL_CASES = 294
-BATCH_SIZE = 50
+TARGET_TOTAL_CASES = 261
+BATCH_SIZE = 25
 
 def extract_monetary_value_fast(text: str) -> str or None:
     if not isinstance(text, str):
@@ -107,14 +107,27 @@ def determine_work_final(evaluation_data, processed_successfully, processed_fail
     print(f"📊 Determinação de trabalho: {len(already_done)} já feitos, {len(work_items)} para rodar")
     return work_items, already_done
 
-def build_system():
+def build_system(vector_store, chunk_size, k, vizinhos, pdf_directory):
     from src.llm_interface import get_llm
-    from src.vector_store_manager import get_vector_store
-    from src.rag_chain_builder import build_rag_chain
-    vector_store = get_vector_store(force_recreate=False)
+    from src.rag_chain_builder import build_rag_chain_fixed
+    
     llm = get_llm()
-    qa_chain = build_rag_chain(llm, vector_store)
-    if not all([vector_store, llm, qa_chain]):
+    use_neighbors = (vizinhos == 1)
+    neighbors_count = 1 if use_neighbors else 0
+    
+    qa_chain = build_rag_chain_fixed(
+        llm=llm,
+        vector_store=vector_store,
+        pdf_directory=pdf_directory,
+        chunk_size=chunk_size,
+        chunk_overlap=0,
+        use_neighbor_retriever=use_neighbors,
+        k=k,
+        neighbors=neighbors_count,
+        force_reload=True
+    )
+    
+    if not qa_chain:
         raise RuntimeError("Falha ao inicializar RAG")
     print("✅ Sistema RAG inicializado")
     return qa_chain
@@ -125,6 +138,7 @@ def evaluate_one_final(qa_chain, item):
     ground_truth_answer = item.get("resposta") or item.get("answer")
     pdf = item.get("pdf", "")
     extrato = item.get("extrato")
+    
     if not question or not ground_truth_answer:
         return pergunta_id, {
             "id_versao_pergunta": pergunta_id,
@@ -140,6 +154,7 @@ def evaluate_one_final(qa_chain, item):
             "sistema": "final_processor",
             "timestamp": time.time()
         }
+    
     try:
         rag_result = qa_chain.invoke({"query": question})
         if isinstance(rag_result, dict):
@@ -150,9 +165,10 @@ def evaluate_one_final(qa_chain, item):
             )
         else:
             generated_answer = str(rag_result or "")
+        
         if not generated_answer.strip():
             generated_answer = "ERRO: LLM retornou vazio"
-        # Extract contexts
+        
         retrieved_contexts = []
         if isinstance(rag_result, dict) and "source_documents" in rag_result:
             for doc in rag_result["source_documents"]:
@@ -177,10 +193,12 @@ def evaluate_one_final(qa_chain, item):
             "sistema": "final_processor",
             "timestamp": time.time()
         }
+    
     expected_value = extract_monetary_value_fast(ground_truth_answer)
     generated_value = extract_monetary_value_fast(generated_answer)
     is_correct = False
     diff_valor = None
+    
     if expected_value and generated_value:
         is_correct = (expected_value == generated_value)
         diff_valor = "exact" if is_correct else f"expected={expected_value}, generated={generated_value}"
@@ -190,6 +208,7 @@ def evaluate_one_final(qa_chain, item):
             diff_valor = "exact text"
         else:
             diff_valor = "not exact"
+    
     return pergunta_id, {
         "id_versao_pergunta": pergunta_id,
         "pergunta": question,
@@ -224,17 +243,20 @@ def retry_empty_contexts(output_jsonl, qa_chain):
             f.write(json.dumps(obj, ensure_ascii=False) + '\n')
     print("✅ Retentativa dos contextos vazios concluída.")
 
-def run_final_evaluation(input_file, output_file):
+def run_final_evaluation(input_file, output_file, vector_store, chunk_size, k, vizinhos, pdf_directory):
     print(f"🚀 Processando {input_file} → {output_file}")
     evaluation_data = load_evaluation_data(input_file)
     if not evaluation_data:
         print(f"❌ Nenhum dado para processar.")
         return
-    qa_chain = build_system()
+    
+    qa_chain = build_system(vector_store, chunk_size, k, vizinhos, pdf_directory)
+    
     if os.path.exists(output_file):
         import shutil
         shutil.copy2(output_file, output_file + ".bak")
         print(f"💾 Backup criado: {output_file}.bak")
+    
     processed_successfully, processed_failed, failed_retryable = load_existing_results_final(output_file)
     total_processed = len(processed_successfully) + len(processed_failed)
     run_count = 0
@@ -269,7 +291,6 @@ def run_final_evaluation(input_file, output_file):
             print(f"🎊 Meta atingida! {total_processed} casos processados >= {TARGET_TOTAL_CASES}")
             break
 
-    # RETRY CASES WITH EMPTY CONTEXT AT END
     retry_empty_contexts(output_file, qa_chain)
 
 if __name__ == "__main__":

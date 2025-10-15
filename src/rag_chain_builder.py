@@ -1,11 +1,6 @@
-# rag_chain_builder_fixed.py
-# RAG Chain Builder usando componentes CORRIGIDOS
-from tqdm import tqdm  # ← Make sure this import exists!
-
+from tqdm import tqdm
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-from .config import RETRIEVER_SEARCH_K
-from .vector_store_manager import load_and_chunk_pdfs, PDF_DIRECTORY
 
 PROMPT_TEMPLATE_LEGAL = """
 Você é um assistente especializado em encontrar valores monetários em contratos públicos do Diário Oficial brasileiro.
@@ -35,20 +30,11 @@ FORMATO OBRIGATÓRIO DA RESPOSTA:
 {question}
 """
 
-
 _cached_rag_chain = None
 
-def build_rag_chain_fixed(llm, vector_store, use_neighbor_retriever=True, k=1, neighbors=1, force_reload=False):
+def build_rag_chain_fixed(llm, vector_store, pdf_directory, chunk_size, chunk_overlap, use_neighbor_retriever=True, k=1, neighbors=1, force_reload=False):
     """
     Constrói cadeia RAG usando componentes CORRIGIDOS
-    
-    Args:
-        llm: Modelo de linguagem
-        vector_store: Vector store corrigido
-        use_neighbor_retriever: Se True, usa retriever com vizinhos
-        k: Número de chunks principais
-        neighbors: Número de vizinhos antes/depois
-        force_reload: Se True, recarrega a chain
     """
     global _cached_rag_chain
     if _cached_rag_chain is not None and not force_reload:
@@ -62,11 +48,8 @@ def build_rag_chain_fixed(llm, vector_store, use_neighbor_retriever=True, k=1, n
     try:
         if use_neighbor_retriever:
             print("🏠 Construindo RAG com Neighbor Retriever CORRIGIDO...")
-            
-            # Carregar chunks - IMPORTANTE: mesmos chunks do índice
-            all_chunks = load_and_chunk_pdfs(PDF_DIRECTORY)
-            
-            # Usar neighbor retriever corrigido
+            from .vector_store_manager import load_and_chunk_pdfs
+            all_chunks = load_and_chunk_pdfs(pdf_directory, chunk_size, chunk_overlap)
             from .neighbor_retriever import SimpleNeighborRetriever
             retriever = SimpleNeighborRetriever(
                 vector_store=vector_store,
@@ -74,20 +57,16 @@ def build_rag_chain_fixed(llm, vector_store, use_neighbor_retriever=True, k=1, n
                 k=k,
                 neighbors=neighbors
             )
-            
             print(f"✅ Neighbor Retriever: k={k}, neighbors={neighbors}")
-            
         else:
             print("🔍 Construindo RAG com retriever básico...")
             retriever = vector_store.as_retriever(search_kwargs={"k": k})
 
-        # Prompt otimizado para documentos legais
         prompt = PromptTemplate(
             template=PROMPT_TEMPLATE_LEGAL,
             input_variables=["context", "question"]
         )
         
-        # Criar chain
         qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="stuff",
@@ -107,38 +86,42 @@ def build_rag_chain_fixed(llm, vector_store, use_neighbor_retriever=True, k=1, n
         traceback.print_exc()
         return None
 
-# Funções de conveniência
-def build_rag_chain(llm, vector_store, force_reload=False):
-    """Versão padrão com neighbor retriever (recomendada)"""
+def build_rag_chain(llm, vector_store, pdf_directory, chunk_size, chunk_overlap, k=5, neighbors=1, force_reload=False):
+    """Versão padrão com neighbor retriever"""
     return build_rag_chain_fixed(
         llm=llm,
         vector_store=vector_store,
+        pdf_directory=pdf_directory,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
         use_neighbor_retriever=True,
-        k=RETRIEVER_SEARCH_K,
-        neighbors=1,
+        k=k,
+        neighbors=neighbors,
         force_reload=force_reload
     )
 
-def build_rag_chain_with_neighbors(llm, vector_store, force_reload=False):
-    """Versão com neighbor retriever (mesmo que build_rag_chain)"""
-    return build_rag_chain(llm, vector_store, force_reload)
-
-def build_rag_chain_basic(llm, vector_store, force_reload=False):
-    """Versão básica sem neighbor retriever (para comparação)"""
+def build_rag_chain_basic(llm, vector_store, pdf_directory, chunk_size, chunk_overlap, k=5, force_reload=False):
+    """Versão básica sem neighbor retriever"""
     return build_rag_chain_fixed(
         llm=llm,
         vector_store=vector_store,
+        pdf_directory=pdf_directory,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
         use_neighbor_retriever=False,
-        k=RETRIEVER_SEARCH_K,
+        k=k,
         neighbors=0,
         force_reload=force_reload
     )
 
-def build_rag_chain_custom(llm, vector_store, k=3, neighbors=1, force_reload=False):
+def build_rag_chain_custom(llm, vector_store, pdf_directory, chunk_size, chunk_overlap, k=3, neighbors=1, force_reload=False):
     """Versão customizável para experimentos"""
     return build_rag_chain_fixed(
         llm=llm,
         vector_store=vector_store,
+        pdf_directory=pdf_directory,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
         use_neighbor_retriever=True,
         k=k,
         neighbors=neighbors,

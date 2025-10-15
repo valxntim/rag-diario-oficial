@@ -39,7 +39,7 @@ FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
 # Parâmetros do LLM (geração, ex: Llama 3/4 via Ollama)
 #OLLAMA_LLM_URL = "http://localhost:11434"    # Mude para o IP/porta de outro servidor se necessário
-#OLLAMA_LLM_MODEL = "llama3:latest"           # Altere conforme o modelo local disponível (veja com 'ollama list')
+#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"           # Altere conforme o modelo local disponível (veja com 'ollama list')
 
 
 
@@ -77,15 +77,14 @@ OLLAMA_EMBEDDING_URL = "http://localhost:11434"
 #FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
 # --- Configurações dos Modelos de IA (Ollama) ---
-#OLLAMA_LLM_URL = "http://164.41.75.221:11434"
-#OLLAMA_LLM_MODEL = "llama4:latest"
-
-OLLAMA_LLM_URL = "http://localhost:11434"  # Default do servidor Ollama
-#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"       # Novo tag criado via Modelfile
+#OLLAMA_LLM_URL = "http://localhost:11434"
+#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"
+OLLAMA_LLM_URL = "http://164.41.75.221:11434"
+OLLAMA_LLM_MODEL = "llama4:latest"       # Novo tag criado via Modelfile
 # Em src/llm_interface.py ou onde você define o modelo
-#OLLAMA_LLM_MODEL = "qwen2.5:latest"  # Mude de llama3.1:8b-32k
-OLLAMA_LLM_MODEL = "command-r:latest"
-
+#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"  # Mude de llama3.1:8b-32k
+#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"
+#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"
 # --- MUDANÇA 1: Aponte para o novo modelo de embedding ---
 # URL para o modelo de Embedding (agora usando o remoto também)
 #OLLAMA_EMBEDDING_URL = "http://164.41.75.221:11434" 
