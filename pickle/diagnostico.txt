@@ -1,0 +1,33 @@
+obj é um dict, 6 chaves.
+Principais chaves: EXTRATO_CONTRATO, AVISO_SUSPENSAO_LICITACAO, EXTRATO_ADITAMENTO_CONTRATUAL, AVISO_LICITACAO, AVISO_ANUL_REV_LICITACAO, EXTRATO_CONVENIO
+  obj['EXTRATO_CONTRATO'] = <class 'list'>
+  obj['AVISO_SUSPENSAO_LICITACAO'] = <class 'list'>
+  obj['EXTRATO_ADITAMENTO_CONTRATUAL'] = <class 'list'>
+obj['EXTRATO_CONTRATO'] é uma lista, len=1734.
+  Tipo dos elementos: <class 'list'>
+  Exemplos: [ [ 'EXTRATO DO CONTRATO DE PRESTACAO DE SERVICOS No 03/2019\n'
+    'NOS TERMOS DO PADRAO CEB\n'
+    'PROCESSO: 00145-00000647/2019-23; DAS PARTES: ADMINISTRACAO REGIONAL DO\n'
+    'RECANTO DAS EMAS - RA-XV x CEB DISTRIBUICAO S.A - CEB; DO FUNDAMENTO\n'
+    'LEGAL: Inexigibilidade de Licitacao com base no caput do artigo 25 da Lei 8.666/1993; DO\n'
+    'OBJETO: Prestacao e utilizacao de servico publico de energia eletrica entre a distribuidora e o\n'
+    'consumidor, de acordo com o Projeto Basico que integra o presente termo. DO VALOR: O valor\n'
+    'anual estimado do contrato e de R$ 133.242,81 (cento e trinta e tres mil, duzentos e quarenta e dois\n'
+    'reais e oitenta e um centavos); DA DOTACAO ORCAMENTARIA: Unidade Orcamentaria: 09117;\n'
+    'Programa de Trabalho: 04.128.6001.8517.0055; Natureza da Despesa: 3.3.90.39; Fonte de Recursos:\n'
+    '100 e 120; Nota de Empenho no 2019NE00204, no valor inicial de R$ 9.993,20 (nove mil, novecentos\n'
+    'e noventa e tres reais e vint
+obj['AVISO_SUSPENSAO_LICITACAO'] é uma lista, len=82.
+  Tipo dos elementos: <class 'list'>
+  Exemplos: [ [ 'AVISO DE SUSPENSAO\n'
+    'O Instituto do Cancer Infantil e Pediatria Especializada - Icipe torna publico a suspensao temporaria da\n'
+    'empresa D-Hosp Distribuidora Hospitalar Importacao e Exportacao Ltda - CNPJ 08.076.127/0012-59, em\n'
+    'participar de cotacoes previas ou contratar com o Hospital da Crianca de Brasilia Jose Alencar pelo\n'
+    'periodo de 01 (um) ano, a contar da publicacao. Este procedimento foi fundamentado no Decreto 33.390\n'
+    'de 06 de dezembro de 2011, que dispoe sobre a contratacao de obras, servicos e aquisicao de bens pelas\n'
+    'Organizacoes Sociais qualificadas no ambito do Distrito Federal, no principio da previa e ampla defesa e\n'
+    'foi motivado pela nao entrega dos Medicamentos solicitados. Brasilia/DF, 10 de outubro de 2019. Nucleo\n'
+    'de Planejamento e Logistica - NPL, Icipe/HCB.',
+    ('orgao_licitante', 'Instituto do Cancer Infantil e Pediatria Especializada'),
+    ( 'objeto_licitacao',
+      'contratacao de obras, servicos e
