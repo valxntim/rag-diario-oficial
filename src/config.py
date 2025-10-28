@@ -15,7 +15,7 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 # Pasta principal de dados
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 # Pasta onde encontrar seus PDFs originais para indexar
-PDF_DIRECTORY = os.path.join(DATA_DIR, "pdfs", "contratos_controlado")
+PDF_DIRECTORY = os.path.join(DATA_DIR, "pdfs", "contratos_validado")
 
 # ===========================
 # --- Dataset de Avaliação ---
@@ -30,7 +30,7 @@ DATASET_FILE_PATH = os.path.join(DATA_DIR, "benchmark_final_valor.jsonl")
 
 # Diretório e nome do índice FAISS
 VECTOR_STORE_DIR = os.path.join(DATA_DIR, "vector_store")
-FAISS_INDEX_NAME = "faiss_index_chunk600_base_controlada"
+FAISS_INDEX_NAME = "faiss_index_chunk600_base_validado"
 FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
 # ===========================
@@ -77,10 +77,10 @@ OLLAMA_EMBEDDING_URL = "http://localhost:11434"
 #FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
 # --- Configurações dos Modelos de IA (Ollama) ---
-#OLLAMA_LLM_URL = "http://localhost:11434"
-#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"
-OLLAMA_LLM_URL = "http://164.41.75.221:11434"
-OLLAMA_LLM_MODEL = "llama4:latest"       # Novo tag criado via Modelfile
+OLLAMA_LLM_URL = "http://localhost:11434"
+OLLAMA_LLM_MODEL = "llama3.1:8b-32k"
+#OLLAMA_LLM_URL = "http://164.41.75.221:11434"
+#OLLAMA_LLM_MODEL = "llama4:latest"       # Novo tag criado via Modelfile
 # Em src/llm_interface.py ou onde você define o modelo
 #OLLAMA_LLM_MODEL = "llama3.1:8b-32k"  # Mude de llama3.1:8b-32k
 #OLLAMA_LLM_MODEL = "llama3.1:8b-32k"

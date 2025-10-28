@@ -8,20 +8,25 @@ import torch
 from itertools import product
 
 # --- Configurações de Teste ---
-CHUNKS       = [400, 600, 800, 1000]
-VIZINHOS     = [0, 1]
-K_VALUES     = [1, 3, 5, 7]
-#MODELS       = [{'name':'llama3','url':'http://localhost:11434','model':'llama3.1:8b-32k'}]
-MODELS       = [{'name': 'llama4', 'url': 'http://164.41.75.221:11434', 'model': 'llama4:latest'}]
+#CHUNKS       = [400, 600, 800, 1000]
+CHUNKS       = [600]
+#VIZINHOS     = [0, 1]
+VIZINHOS     = [1]
+#K_VALUES     = [1, 3, 5, 7]
+K_VALUES     = [1]
+MODELS       = [{'name':'llama3','url':'http://localhost:11434','model':'llama3.1:8b-32k'}]
+#MODELS       = [{'name': 'llama4', 'url': 'http://164.41.75.221:11434', 'model': 'llama4:latest'}]
+#BASES        = [
+ #   {'name':'a','file':'base_a_objeto.jsonl'},
+  #  {'name':'b','file':'base_b_extrato_final.jsonl'}]
 BASES        = [
-    {'name':'a','file':'base_a_objeto.jsonl'},
-    {'name':'b','file':'base_b_extrato_final.jsonl'}
+    {'name':'a','file':'dataset_RAG_Base_A_MVP.jsonl'}
 ]
 
-RESULTS_DIR  = "resultados_jsonl"
-CSV_FILE     = "resultados_finais.csv"
+RESULTS_DIR  = "resultados_MVP_A_jsonl"
+CSV_FILE     = "resultados_finais_huge.csv"
 VECTOR_STORE_DIR = "data/vector_store"
-PDF_DIRECTORY    = "data/pdfs/contratos_controlado"
+PDF_DIRECTORY    = "data/pdfs/contratos_validado"
 
 def clear_gpu():
     if torch.cuda.is_available():
@@ -36,7 +41,7 @@ def reload_modules():
 def run_test(chunk, viz, k, model, base_info):
     clear_gpu()
     
-    faiss_index_name = f"faiss_index_chunk{chunk}_base_controlada"
+    faiss_index_name = f"faiss_index_chunk{chunk}_base_validado"
     faiss_index_path = os.path.join(VECTOR_STORE_DIR, faiss_index_name)
 
     reload_modules()
