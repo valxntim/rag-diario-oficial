@@ -7,23 +7,53 @@ import gc
 import torch
 from itertools import product
 
+# --- Verificação de FAISS-GPU ---
+try:
+    import faiss
+    
+    res = faiss.StandardGpuResources()
+    print("✅ FAISS-GPU detectado e acessível! Os testes usarão a GPU.")
+    # Opcional: Descomente para ver qual GPU está sendo usada
+    # print(f"   -> Usando GPU ID: {res.getDevice()}")
+except ImportError:
+    print("⚠️ AVISO: A biblioteca 'faiss' não está instalada.")
+    print("   -> Rode: pip install faiss-gpu")
+    sys.exit() # Para o script se FAISS não estiver instalado
+except AttributeError:
+    print("❌ AVISO: FAISS-CPU detectado (ou erro na configuração da GPU).")
+    print("   -> A indexação e busca serão MUITO lentas.")
+    print("   -> Para usar a GPU, instale 'faiss-gpu':")
+    print("      pip uninstall faiss-cpu")
+    print("      pip install faiss-gpu")
+    # Decida se quer parar o script ou continuar na CPU
+    # sys.exit() # Descomente para parar se a GPU não for encontrada
+except Exception as e:
+    print(f"❌ ERRO Inesperado ao verificar FAISS-GPU: {e}")
+    print("   -> Verifique sua instalação do CUDA e do FAISS.")
+    # sys.exit() # Descomente para parar em caso de erro
+
+# --- Configurações de Teste ---
+# (Restante do seu código continua aqui)
+# ...
+
+
 # --- Configurações de Teste ---
 #CHUNKS       = [400, 600, 800, 1000]
 CHUNKS       = [600]
 #VIZINHOS     = [0, 1]
 VIZINHOS     = [1]
 #K_VALUES     = [1, 3, 5, 7]
-K_VALUES     = [1]
+K_VALUES     = [5]
 MODELS       = [{'name':'llama3','url':'http://localhost:11434','model':'llama3.1:8b-32k'}]
 #MODELS       = [{'name': 'llama4', 'url': 'http://164.41.75.221:11434', 'model': 'llama4:latest'}]
 #BASES        = [
  #   {'name':'a','file':'base_a_objeto.jsonl'},
   #  {'name':'b','file':'base_b_extrato_final.jsonl'}]
 BASES        = [
-    {'name':'a','file':'dataset_RAG_Base_A_MVP.jsonl'}
+    {'name':'a','file':'dataset_RAG_VALIDADO_565.jsonl'}
 ]
 
-RESULTS_DIR  = "resultados_MVP_A_jsonl"
+RESULTS_DIR  = "dataset_RAG_VALIDADO_565_jsonl"
 CSV_FILE     = "resultados_finais_huge.csv"
 VECTOR_STORE_DIR = "data/vector_store"
 PDF_DIRECTORY    = "data/pdfs/contratos_validado"
