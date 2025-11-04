@@ -50,11 +50,11 @@ MODELS       = [{'name':'llama3','url':'http://localhost:11434','model':'llama3.
  #   {'name':'a','file':'base_a_objeto.jsonl'},
   #  {'name':'b','file':'base_b_extrato_final.jsonl'}]
 BASES        = [
-    {'name':'a','file':'dataset_RAG_VALIDADO_565.jsonl'}
+    {'name':'b','file':'dataset_RAG_BaseB_UNIAO_FINAL.jsonl'}
 ]
 
-RESULTS_DIR  = "dataset_RAG_VALIDADO_565_jsonl"
-CSV_FILE     = "resultados_finais_huge.csv"
+RESULTS_DIR  = "dataset_RAG_VALIDADO_UNIAOCORRETO_jsonl"
+CSV_FILE     = "resultados_finais_FINALE.csv"
 VECTOR_STORE_DIR = "data/vector_store"
 PDF_DIRECTORY    = "data/pdfs/contratos_validado"
 
