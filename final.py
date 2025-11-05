@@ -32,29 +32,21 @@ except Exception as e:
     print("   -> Verifique sua instalação do CUDA e do FAISS.")
     # sys.exit() # Descomente para parar em caso de erro
 
-# --- Configurações de Teste ---
-# (Restante do seu código continua aqui)
-# ...
 
 
-# --- Configurações de Teste ---
-#CHUNKS       = [400, 600, 800, 1000]
-CHUNKS       = [600]
-#VIZINHOS     = [0, 1]
-VIZINHOS     = [1]
-#K_VALUES     = [1, 3, 5, 7]
-K_VALUES     = [5]
+# --- Configurações de Teste (PARA BASE PEQUENA) ---
+CHUNKS       = [400, 600, 800, 1000]
+VIZINHOS     = [0, 1]
+K_VALUES     = [1, 3, 5, 7]
 MODELS       = [{'name':'llama3','url':'http://localhost:11434','model':'llama3.1:8b-32k'}]
-#MODELS       = [{'name': 'llama4', 'url': 'http://164.41.75.221:11434', 'model': 'llama4:latest'}]
-#BASES        = [
- #   {'name':'a','file':'base_a_objeto.jsonl'},
-  #  {'name':'b','file':'base_b_extrato_final.jsonl'}]
+
 BASES        = [
-    {'name':'b','file':'dataset_RAG_BaseB_UNIAO_FINAL.jsonl'}
+    {'name':'a','file':'base_a_objeto.jsonl'},
+    {'name':'b','file':'base_b_extrato_final.jsonl'}
 ]
 
-RESULTS_DIR  = "dataset_RAG_VALIDADO_UNIAOCORRETO_jsonl"
-CSV_FILE     = "resultados_finais_FINALE.csv"
+RESULTS_DIR  = "resultados_valido_base_menor" # <-- Aponta para a pasta limpa
+CSV_FILE     = "resultados_finais_base_pequena.csv" # <-- Novo CSV de resultados
 VECTOR_STORE_DIR = "data/vector_store"
 PDF_DIRECTORY    = "data/pdfs/contratos_validado"
 
@@ -88,7 +80,8 @@ def run_test(chunk, viz, k, model, base_info):
         pdf_directory=PDF_DIRECTORY,
         chunk_size=chunk,
         chunk_overlap=0,
-        force_recreate=False
+        force_recreate=not os.path.exists(faiss_index_path)
+        #force_recreate=False
     )
     
     run_final_evaluation(

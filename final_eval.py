@@ -18,7 +18,7 @@ except locale.Error:
 MAX_WORKERS = 2
 PER_TASK_TIMEOUT = 180
 MAX_ATTEMPTS = 2
-TARGET_TOTAL_CASES = 1851
+TARGET_TOTAL_CASES = 261
 BATCH_SIZE = 25
 
 # --- FUNÇÃO DE EXTRAÇÃO DE VALOR (v2 - Retorna String Normalizada) ---
