@@ -13,7 +13,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
-
+view_results_streamlit.py
 # Dados e Arquivos Grandes
 # É CRUCIAL não enviar dados sensíveis ou arquivos muito grandes para o Git.
 # Seus PDFs e o índice FAISS podem ser grandes e/ou conter dados que você não quer no repositório.
@@ -26,7 +26,12 @@ garbage/
 data/
 hello-ngrok/
 models/
-*.jsonl
+melhora_perguntas/
+results/
+apaga/
+consolidate_bases/
+tesouro/
+#*.jsonl
 # Ou, se quiser ser mais específico:
 # data/pdfs/pessoal/
 # data/pdfs/contratos/
