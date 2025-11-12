@@ -282,7 +282,7 @@ Resultado: CSV consolidado com todas as combinações testadas.
 
 | Componente | Este Projeto | Baseline |
 |-----------|-------------|----------|
-| **Embedding** | Legal-BERT PT-BR + BGE-M3 | OpenAI embeddings (pago) |
+| **Embedding** | BGE-M3 | OpenAI embeddings (pago) |
 | **Busca Vetorial** | FAISS CPU/GPU | Elasticsearch |
 | **LLM** | LLaMA 3.1 local | GPT-4 (pago) |
 | **Custo** | $0 (open-source) | $50+/mês |
@@ -365,26 +365,6 @@ requests, orjson, PyYAML (Utils)
 
 **Recomendação:** Use GPU para produção (FAISS-GPU)
 
----
-
-## 🐳 Docker (Opcional)
-
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-CMD ["python", "final_eval.py"]
-```
-
-Build:
-```bash
-docker build -t rag-diario-oficial .
-docker run --gpus all rag-diario-oficial
-```
-
----
 
 ## 🤝 Contribuições
 
@@ -392,9 +372,8 @@ Contribuições são bem-vindas! Areas de melhoria:
 
 - [ ] Suporte a outros LLMs (Mistral, Phi, etc)
 - [ ] Interface web (FastAPI + React)
-- [ ] Avaliação em novos domínios (jurisprudência, licitações)
+- [ ] Avaliação em novos domínios
 - [ ] Otimizações de performance
-- [ ] Documentação em inglês
 
 ---
 
