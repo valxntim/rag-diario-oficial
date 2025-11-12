@@ -330,42 +330,6 @@ Este trabalho contribui com:
 
 ---
 
-## 🛠️ Dependências Essenciais
-
-✅ **Otimizadas de 131 → 21 pacotes (92% redução!)**
-
-```
-langchain (RAG framework)
-langchain-community (Integrações)
-langchain-ollama (Suporte Ollama)
-faiss-cpu/gpu (Busca vetorial)
-sentence-transformers (Embeddings)
-torch (Base dos transformers)
-pypdf (Leitura de PDFs)
-tqdm (Progress bars)
-pydantic (Validação)
-requests, orjson, PyYAML (Utils)
-```
-
-[Ver análise completa de dependências](ANALISE_REQUIREMENTS.md)
-
----
-
-## 📊 Benchmarks de Performance
-
-### GPU (NVIDIA RTX 4090)
-- Indexação: 50ms/chunk
-- Query: 100-200ms
-- LLM response: 500ms-1s
-
-### CPU (Intel i9-12900K)
-- Indexação: 200ms/chunk
-- Query: 500-800ms
-- LLM response: 2-3s
-
-**Recomendação:** Use GPU para produção (FAISS-GPU)
-
-
 ## 🤝 Contribuições
 
 Contribuições são bem-vindas! Areas de melhoria:
@@ -410,9 +374,6 @@ Contribuições são bem-vindas! Areas de melhoria:
 ---
 
 **Status:** Production-Ready ✅ | Last Updated: Novembro 2025
-
-**Para mais detalhes técnicos, consulte [ANALISE_REQUIREMENTS.md](ANALISE_REQUIREMENTS.md) e os comentários no código.**
-
 ---
 
 ### 🎉 Seções Principais
