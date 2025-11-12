@@ -1,0 +1,317 @@
+{
+    "dataset": {
+        "base_grande_total_extratos_maestra": 1592,
+        "base_grande_extratos_validos_uniao": 554,
+        "base_grande_extratos_ignorados": 1038,
+        "base_grande_perguntas_base_a": 1662,
+        "base_grande_perguntas_base_b": 1662,
+        "base_pequena_perguntas_base_a": 261,
+        "base_pequena_extratos_unicos": 87
+    },
+    "corpus": {
+        "base_grande_validado": {
+            "total_documentos_pdf": 58,
+            "total_paginas": 4213,
+            "total_palavras_aprox": 6597591,
+            "total_tokens_aprox_cl100k": 15727189
+        },
+        "base_pequena_controlado": {
+            "total_documentos_pdf": 36,
+            "total_paginas": 2756,
+            "total_palavras_aprox": 4087516,
+            "total_tokens_aprox_cl100k": 9682171
+        }
+    },
+    "distribuicao_pdf_base_grande": [
+        {
+            "nome_do_pdf": "DODF 215 18-11-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 61,
+            "quantidade_perguntas_validas": 183
+        },
+        {
+            "nome_do_pdf": "DODF 044 07-03-2022 INTEGRA.pdf",
+            "quantidade_extratos_validos": 52,
+            "quantidade_perguntas_validas": 156
+        },
+        {
+            "nome_do_pdf": "DODF 195 11-10-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 27,
+            "quantidade_perguntas_validas": 81
+        },
+        {
+            "nome_do_pdf": "DODF 244 24-12-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 26,
+            "quantidade_perguntas_validas": 78
+        },
+        {
+            "nome_do_pdf": "DODF 011 16-01-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 20,
+            "quantidade_perguntas_validas": 60
+        },
+        {
+            "nome_do_pdf": "DODF 094 21-05-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 19,
+            "quantidade_perguntas_validas": 57
+        },
+        {
+            "nome_do_pdf": "DODF 226 28-11-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 19,
+            "quantidade_perguntas_validas": 57
+        },
+        {
+            "nome_do_pdf": "DODF 236 20-12-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 19,
+            "quantidade_perguntas_validas": 57
+        },
+        {
+            "nome_do_pdf": "DODF 232 14-12-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 18,
+            "quantidade_perguntas_validas": 54
+        },
+        {
+            "nome_do_pdf": "DODF 224 02-12-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 17,
+            "quantidade_perguntas_validas": 51
+        },
+        {
+            "nome_do_pdf": "DODF 129 10-07-2018 INTEGRA.pdf",
+            "quantidade_extratos_validos": 14,
+            "quantidade_perguntas_validas": 42
+        },
+        {
+            "nome_do_pdf": "DODF 227 29-11-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 14,
+            "quantidade_perguntas_validas": 42
+        },
+        {
+            "nome_do_pdf": "DODF 181 24-09-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 13,
+            "quantidade_perguntas_validas": 39
+        },
+        {
+            "nome_do_pdf": "DODF 233 15-12-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 11,
+            "quantidade_perguntas_validas": 33
+        },
+        {
+            "nome_do_pdf": "DODF 102 31-05-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 10,
+            "quantidade_perguntas_validas": 30
+        },
+        {
+            "nome_do_pdf": "DODF 191 08-10-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 9,
+            "quantidade_perguntas_validas": 27
+        },
+        {
+            "nome_do_pdf": "DODF 238 16-12-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 9,
+            "quantidade_perguntas_validas": 27
+        },
+        {
+            "nome_do_pdf": "DODF 109 11-06-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 9,
+            "quantidade_perguntas_validas": 27
+        },
+        {
+            "nome_do_pdf": "DODF 126 07-07-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 9,
+            "quantidade_perguntas_validas": 27
+        },
+        {
+            "nome_do_pdf": "DODF 123 02-07-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 8,
+            "quantidade_perguntas_validas": 24
+        },
+        {
+            "nome_do_pdf": "DODF 226 06-12-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 8,
+            "quantidade_perguntas_validas": 24
+        },
+        {
+            "nome_do_pdf": "DODF 242 20-12-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 7,
+            "quantidade_perguntas_validas": 21
+        },
+        {
+            "nome_do_pdf": "DODF 125 06-07-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 7,
+            "quantidade_perguntas_validas": 21
+        },
+        {
+            "nome_do_pdf": "DODF 011 17-01-2022 INTEGRA.pdf",
+            "quantidade_extratos_validos": 7,
+            "quantidade_perguntas_validas": 21
+        },
+        {
+            "nome_do_pdf": "DODF 236 12-12-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 7,
+            "quantidade_perguntas_validas": 21
+        },
+        {
+            "nome_do_pdf": "DODF 224 26-11-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 6,
+            "quantidade_perguntas_validas": 18
+        },
+        {
+            "nome_do_pdf": "DODF 113 18-06-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 6,
+            "quantidade_perguntas_validas": 18
+        },
+        {
+            "nome_do_pdf": "DODF 173 14-09-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 6,
+            "quantidade_perguntas_validas": 18
+        },
+        {
+            "nome_do_pdf": "DODF 132 16-07-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 6,
+            "quantidade_perguntas_validas": 18
+        },
+        {
+            "nome_do_pdf": "DODF 055 22-03-2022 INTEGRA.pdf",
+            "quantidade_extratos_validos": 6,
+            "quantidade_perguntas_validas": 18
+        },
+        {
+            "nome_do_pdf": "DODF 245 27-12-2018 INTEGRA.pdf",
+            "quantidade_extratos_validos": 6,
+            "quantidade_perguntas_validas": 18
+        },
+        {
+            "nome_do_pdf": "DODF 053 18-03-2022 INTEGRA.pdf",
+            "quantidade_extratos_validos": 5,
+            "quantidade_perguntas_validas": 15
+        },
+        {
+            "nome_do_pdf": "DODF 152 13-08-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 5,
+            "quantidade_perguntas_validas": 15
+        },
+        {
+            "nome_do_pdf": "DODF 145 02-08-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 5,
+            "quantidade_perguntas_validas": 15
+        },
+        {
+            "nome_do_pdf": "DODF 060 29-03-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 5,
+            "quantidade_perguntas_validas": 15
+        },
+        {
+            "nome_do_pdf": "DODF 019 27-01-2022 INTEGRA.pdf",
+            "quantidade_extratos_validos": 5,
+            "quantidade_perguntas_validas": 15
+        },
+        {
+            "nome_do_pdf": "DODF 222 22-11-2018 INTEGRA.pdf",
+            "quantidade_extratos_validos": 5,
+            "quantidade_perguntas_validas": 15
+        },
+        {
+            "nome_do_pdf": "DODF 184 29-09-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 5,
+            "quantidade_perguntas_validas": 15
+        },
+        {
+            "nome_do_pdf": "DODF 138 24-07-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 4,
+            "quantidade_perguntas_validas": 12
+        },
+        {
+            "nome_do_pdf": "DODF 039 25-02-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 4,
+            "quantidade_perguntas_validas": 12
+        },
+        {
+            "nome_do_pdf": "DODF 115 19-06-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 4,
+            "quantidade_perguntas_validas": 12
+        },
+        {
+            "nome_do_pdf": "DODF 110 15-06-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 4,
+            "quantidade_perguntas_validas": 12
+        },
+        {
+            "nome_do_pdf": "DODF 235 17-12-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 4,
+            "quantidade_perguntas_validas": 12
+        },
+        {
+            "nome_do_pdf": "DODF 207 30-10-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 4,
+            "quantidade_perguntas_validas": 12
+        },
+        {
+            "nome_do_pdf": "DODF 071 15-04-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 4,
+            "quantidade_perguntas_validas": 12
+        },
+        {
+            "nome_do_pdf": "DODF 143 30-07-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 4,
+            "quantidade_perguntas_validas": 12
+        },
+        {
+            "nome_do_pdf": "DODF 172 10-09-2018 INTEGRA.pdf",
+            "quantidade_extratos_validos": 4,
+            "quantidade_perguntas_validas": 12
+        },
+        {
+            "nome_do_pdf": "DODF 108 08-06-2018 INTEGRA.pdf",
+            "quantidade_extratos_validos": 3,
+            "quantidade_perguntas_validas": 9
+        },
+        {
+            "nome_do_pdf": "DODF 029 09-02-2018 INTEGRA.pdf",
+            "quantidade_extratos_validos": 3,
+            "quantidade_perguntas_validas": 9
+        },
+        {
+            "nome_do_pdf": "DODF 117 24-06-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 3,
+            "quantidade_perguntas_validas": 9
+        },
+        {
+            "nome_do_pdf": "DODF 124 04-07-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 3,
+            "quantidade_perguntas_validas": 9
+        },
+        {
+            "nome_do_pdf": "DODF 130 12-07-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 3,
+            "quantidade_perguntas_validas": 9
+        },
+        {
+            "nome_do_pdf": "DODF 107 10-06-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 3,
+            "quantidade_perguntas_validas": 9
+        },
+        {
+            "nome_do_pdf": "DODF 193 09-10-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 2,
+            "quantidade_perguntas_validas": 6
+        },
+        {
+            "nome_do_pdf": "DODF 020 29-01-2019 INTEGRA.pdf",
+            "quantidade_extratos_validos": 2,
+            "quantidade_perguntas_validas": 6
+        },
+        {
+            "nome_do_pdf": "DODF 102 01-06-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 2,
+            "quantidade_perguntas_validas": 6
+        },
+        {
+            "nome_do_pdf": "DODF 121 30-06-2021 INTEGRA.pdf",
+            "quantidade_extratos_validos": 2,
+            "quantidade_perguntas_validas": 6
+        },
+        {
+            "nome_do_pdf": "DODF 231 06-12-2018 INTEGRA.pdf",
+            "quantidade_extratos_validos": 1,
+            "quantidade_perguntas_validas": 3
+        }
+    ]
+}

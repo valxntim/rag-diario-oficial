@@ -1,0 +1,3 @@
+arquivo_jsonl,chunk,vizinho,k,modelo,acertos,erros,acuracia
+600_1_5_a_llama3,600,1,5,llama3,805,857,48.44%
+600_1_5_b_llama3,600,1,5,llama3,1006,656,60.53%

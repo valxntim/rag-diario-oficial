@@ -1,101 +1,108 @@
+"""
+CONFIGURAÇÃO CENTRAL DO SISTEMA RAG
+======================================
+Este arquivo centraliza TODAS as configurações do projeto RAG para Diário Oficial.
+Modifique apenas as variáveis abaixo conforme seu ambiente/necessidade.
+"""
+
 import os
 
-# ===========================
-# --- Caminhos Base ---
-# ===========================
 
-# Diretório do arquivo config.py (SRC_ROOT) e do projeto (PROJECT_ROOT)
+# ===========================
+# --- CAMINHOS BASE ---
+# ===========================
+# Define os diretórios raiz do projeto para referenciar recursos
+
+# Diretório onde este arquivo (config.py) está localizado
 SRC_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+# Diretório pai de src/ (raiz do projeto)
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 
-# ===========================
-# --- Diretórios de Dados ---
-# ===========================
 
-# Pasta principal de dados
+# ===========================
+# --- DIRETÓRIOS DE DADOS ---
+# ===========================
+# Estrutura de pastas para armazenar dados, PDFs e índices vetoriais
+
+# Pasta principal onde todos os dados serão armazenados ( Onde o FAIS vai ser guardado )
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
-# Pasta onde encontrar seus PDFs originais para indexar
+
+# Pasta onde você coloca os PDFs originais que serão indexados
+# IMPORTANTE: Coloque seus PDFs em: data/pdfs/contratos_validado/
 PDF_DIRECTORY = os.path.join(DATA_DIR, "pdfs", "contratos_validado")
 
-# ===========================
-# --- Dataset de Avaliação ---
-# ===========================
 
-# Caminho para o JSONL com perguntas e respostas de referência
+# ===========================
+# --- DATASET DE AVALIAÇÃO ---
+# ===========================
+# Arquivo JSONL com pares pergunta/resposta para benchmarking
+
+# Caminho para o dataset de avaliação (formato JSONL: 1 JSON por linha)
+# Cada linha deve conter: id_versao_pergunta, pergunta, resposta, pdf, extrato
 DATASET_FILE_PATH = os.path.join(DATA_DIR, "benchmark_final_valor.jsonl")
 
-# ===========================
-# --- Configuração do Vector Store (FAISS) ---
-# ===========================
 
-# Diretório e nome do índice FAISS
+# ===========================
+# --- VECTOR STORE (FAISS) ---
+# ===========================
+# Configuração do índice FAISS para busca vetorial semântica
+
+# Diretório onde o índice FAISS será salvo/carregado
 VECTOR_STORE_DIR = os.path.join(DATA_DIR, "vector_store")
+
+# Nome do índice FAISS (será sufixado com chunk_size)
+# IMPORTANTE: O nome identifica a versão específica dos chunks
 FAISS_INDEX_NAME = "faiss_index_chunk600_base_validado"
+
+# Caminho completo do índice FAISS
 FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
 
-# ===========================
-# --- Configurações dos Modelos de IA (Ollama) ---
-# ===========================
-
-# Parâmetros do LLM (geração, ex: Llama 3/4 via Ollama)
-#OLLAMA_LLM_URL = "http://localhost:11434"    # Mude para o IP/porta de outro servidor se necessário
-#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"           # Altere conforme o modelo local disponível (veja com 'ollama list')
-
-
-
-# Parâmetros do modelo de embedding via Ollama (caso use Ollama para embeddings)
-#OLLAMA_EMBEDDING_URL = "http://localhost:11434"  # MESMO endereço do Ollama rodando modelo para embeddings
-#OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"   # Ou outro, ex: "nomic-embed-text:latest"
 
 # ===========================
-# --- Parâmetros do Pipeline RAG ---
+# --- MODELOS DE IA (OLLAMA) ---
 # ===========================
+# URLs e nomes dos modelos rodando via Ollama (ou servidor remoto)
 
-CHUNK_SIZE = 600            # Tamanho do chunk de texto para indexação
-CHUNK_OVERLAP = 0        # Sobreposição dos chunks
-RETRIEVER_SEARCH_K = 5    # Top K documentos mais similares a serem recuperados por consulta
-#NUM_QUESTIONS_TO_TEST = 8 # Limita quantidade de perguntas em avaliações automáticas (ajuste se quiser debugar rápido)
-
-# ===========================
-# --- Backend de Embeddings ---
-# ===========================
-
-# Escolha entre "ollama" para usar embeddings servidos via Ollama, ou "huggingface" para usar modelos HuggingFace diretamente em Python
-# Exemplo para HuggingFace (BERT jurídico):
-#EMBEDDING_BACKEND = "huggingface"
-HF_EMBEDDING_MODEL = "ulysses-camara/legal-bert-pt-br"
-
-# Exemplo para Ollama (descomente, se for servir embeddings pelo Ollama):
-EMBEDDING_BACKEND = "ollama"
-#OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"
-OLLAMA_EMBEDDING_MODEL = "bge-m3:latest"
-OLLAMA_EMBEDDING_URL = "http://localhost:11434"
-
-# ========== FIM (modifique apenas acima, se possível) ==========
-
-
-#FAISS_INDEX_PATH = os.path.join(VECTOR_STORE_DIR, FAISS_INDEX_NAME)
-
-# --- Configurações dos Modelos de IA (Ollama) ---
+# URL do servidor Ollama para geração de texto (LLM)
+# Se está em outro servidor, mude para: http://IP_REMOTO:11434
 OLLAMA_LLM_URL = "http://localhost:11434"
+
+# Nome/tag do modelo LLM disponível no Ollama
+# Execute: ollama list para ver modelos instalados
 OLLAMA_LLM_MODEL = "llama3.1:8b-32k"
-#OLLAMA_LLM_URL = "http://164.41.75.221:11434"
-#OLLAMA_LLM_MODEL = "llama4:latest"       # Novo tag criado via Modelfile
-# Em src/llm_interface.py ou onde você define o modelo
-#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"  # Mude de llama3.1:8b-32k
-#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"
-#OLLAMA_LLM_MODEL = "llama3.1:8b-32k"
-# --- MUDANÇA 1: Aponte para o novo modelo de embedding ---
-# URL para o modelo de Embedding (agora usando o remoto também)
-#OLLAMA_EMBEDDING_URL = "http://164.41.75.221:11434" 
-#OLLAMA_EMBEDDING_MODEL = "nomic-embed-text:latest"  # <-- NOSSO NOVO CANDIDATO
 
 
+# ===========================
+# --- PARÂMETROS DO PIPELINE RAG ---
+# ===========================
+# Configurações de chunking e retrieval
 
-#OLLAMA_EMBEDDING_URL = "http://localhost:11434"
-#OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"
-#OLLAMA_EMBEDDING_MODEL = "paraphrase-multilingual:278m-mpnet-base-v2-fp16" 
+# Tamanho de cada chunk de texto (em caracteres)
+# Recomendado: 400-1000. Maiores = mais contexto, menos chunks. Menores = mais específico.
+CHUNK_SIZE = 600
 
-#EMBEDDING_BACKEND = "ollama"
-#OLLAMA_EMBEDDING_MODEL = "mxbai-embed-large:latest"
-#OLLAMA_EMBEDDING_URL = "http://localhost:11434"
+# Sobreposição entre chunks consecutivos (em caracteres)
+# Ajuda a evitar cortes no meio de frases. Típico: 0-100.
+CHUNK_OVERLAP = 0
+
+# Número de documentos mais similares a recuperar por query
+# Quanto maior, mais contexto (e mais lento). Típico: 3-10
+RETRIEVER_SEARCH_K = 7
+
+
+# ===========================
+# --- BACKEND DE EMBEDDINGS ---
+# ===========================
+# Escolha qual serviço gera os embeddings (vetores semânticos)
+
+# Escolha entre "ollama" (servir via Ollama) ou "huggingface" (local em Python)
+EMBEDDING_BACKEND = "ollama"
+
+# --------- Se usar Ollama para embeddings ---------
+OLLAMA_EMBEDDING_URL = "http://localhost:11434"
+OLLAMA_EMBEDDING_MODEL = "bge-m3:latest"
+
+# --------- Se usar HuggingFace (comentado, descomente se quiser usar) ---------
+HF_EMBEDDING_MODEL = "ulysses-camara/legal-bert-pt-br"  # Modelo jurídico em PT-BR
+
